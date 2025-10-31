@@ -1,9 +1,21 @@
+enum Civility {
+  Mr
+  Mrs
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  firstName        String
+  lastName         String
+  phone            String?
+  civility         Civility?
+  birthDate        String?
+  acceptNewsletter Boolean?  @default(false)
+  roles            Json    // Store as JSON string or comma-separated
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@map("users")
 }

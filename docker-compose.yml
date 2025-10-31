@@ -1,45 +1,39 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: projet-esgi-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: projet_esgi
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U user -d projet_esgi']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    db:
+        container_name: project_db
+        image: mariadb:latest
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+            - MYSQL_DATABASE=project_db
+        ports:
+            - '3306:3306'
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - app_network
 
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: projet-esgi-backend
-    restart: unless-stopped
-    ports:
-      - '3000:3000'
-    environment:
-      DATABASE_URL: postgresql://user:password@postgres:5432/projet_esgi?schema=public
-      NODE_ENV: production
-      PORT: 3000
-      HOST: 0.0.0.0
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app/backend
-      - ./shared:/app/shared
-      - /app/node_modules
-      - /app/backend/node_modules
+    phpmyadmin:
+        container_name: project_phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - '8080:80'
+        environment:
+            - PMA_HOST=db
+            - PMA_USER=root
+            - PMA_PASSWORD=password
+        depends_on:
+            - db
+        networks:
+            - app_network
+
+networks:
+    app_network:
+        driver: bridge
 
 volumes:
-  postgres_data:
+    minio_data:
+    mysql_data:
+    grafana-storage: 

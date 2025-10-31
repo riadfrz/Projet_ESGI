@@ -1,29 +1,25 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../src/config/prisma';
+import {
+  cleanDatabase,
+  seedUsers
+} from '../src/helpers';
 
 async function main() {
-  console.log('🌱 Starting database seeding...');
+  try {
+    await cleanDatabase();
 
-  // Example: Create a test user
-  const user = await prisma.user.upsert({
-    where: { email: 'test@example.com' },
-    update: {},
-    create: {
-      email: 'test@example.com',
-      name: 'Test User',
-    },
-  });
+    console.log('🌱 Starting seeding process...');
+    await seedUsers();
 
-  console.log('✅ Created user:', user);
-  console.log('🎉 Database seeding completed!');
+    console.log('✅ Seeding completed successfully!');
+  } catch (error) {
+    console.error('❌ Error during seeding:', error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Error during seeding:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error('❌ Fatal error:', e);
+});

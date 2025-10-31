@@ -3,7 +3,6 @@ node_modules/
 .pnpm-store/
 
 # Environment variables
-.env
 .env.local
 .env*.local
 
@@ -32,3 +31,4 @@ Thumbs.db
 # Database
 *.db
 *.db-journal
+backend/src/config/client/

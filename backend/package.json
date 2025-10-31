@@ -8,28 +8,28 @@
     "build": "tsc -b",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:test": "dotenv -e .env.test -- prisma migrate dev",
-    "prisma:format": "prisma format",
+    "prisma:generate": "prisma generate --schema=prisma/schema",
+    "prisma:migrate": "prisma migrate dev --schema=prisma/schema",
+    "prisma:migrate:test": "dotenv -e .env.test -- prisma migrate dev --schema=prisma/schema",
+    "prisma:format": "prisma format --schema=prisma/schema",
     "prisma:seed": "tsx prisma/seed.ts",
-    "prisma:all": "prisma format && prisma generate && prisma migrate dev && tsx prisma/seed.ts",
-    "prisma:docker:generate": "docker exec -it app-cfp-backend-dev sh -c \"cd /app/backend && pnpm prisma generate\"",
-    "prisma:docker:all": "docker exec -it app-cfp-backend-dev sh -c \"cd /app/backend && pnpm prisma format && pnpm prisma generate && pnpm prisma migrate dev --name docker-init && pnpm tsx prisma/seed.ts\"",
-    "prisma:studio": "prisma studio",
-    "format": "prettier --write \"src/**/*.{ts,js,json}\" --config .prettierrc",
-    "test": "dotenv -e .env.test -- jest --runInBand",
-    "test:watch": "dotenv -e .env.test -- jest --watch",
-    "test:coverage": "dotenv -e .env.test -- jest --coverage"
+    "prisma:all": "prisma format --schema=prisma/schema && prisma generate --schema=prisma/schema && prisma migrate dev --schema=prisma/schema && tsx prisma/seed.ts",
+    "prisma:docker:generate": "docker exec -it app-cfp-backend-dev sh -c \"cd /app/backend && pnpm prisma generate --schema=prisma/schema\"",
+    "prisma:docker:all": "docker exec -it app-cfp-backend-dev sh -c \"cd /app/backend && pnpm prisma format --schema=prisma/schema && pnpm prisma generate --schema=prisma/schema && pnpm prisma migrate dev --name docker-init --schema=prisma/schema && pnpm tsx prisma/seed.ts\"",
+    "prisma:studio": "prisma studio --schema=prisma/schema",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\" --config .prettierrc"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@fastify/cors": "^10.0.1",
     "@prisma/client": "^6.1.0",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
-    "fastify": "^5.2.0"
+    "fastify": "^5.2.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@react-email/components": "^0.0.31",

@@ -3,12 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter backend dev",
-    "build": "pnpm --filter backend build",
-    "start": "pnpm --filter backend start"
+    "build": "tsc -b",
+    "start": "ts-node -r module-alias/register src/index.ts",
+    "dev": "nodemon --exec \"node -r @swc-node/register -r tsconfig-paths/register\" src/index.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:test": "dotenv -e .env.test -- prisma migrate dev",
+    "prisma:format": "prisma format",
+    "prisma:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
+    "prisma:all": "prisma format && prisma generate && prisma migrate dev && ts-node -r tsconfig-paths/register prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
   }
 }
