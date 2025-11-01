@@ -1,7 +1,5 @@
 import { fakerUser, users } from '@/fixtures';
 
-import bcrypt from 'bcryptjs';
-
 import { User } from '@/config/client';
 import prisma from '@/config/prisma';
 
@@ -17,7 +15,6 @@ export async function seedUsers(
             const user = await prisma.user.create({
                 data: {
                     ...userData,
-                    password: await bcrypt.hash(users[i].password, 10),
                 },
             });
             createdUsers.push(user);
@@ -29,7 +26,6 @@ export async function seedUsers(
             const user = await prisma.user.create({
                 data: {
                     ...fakerUserDataWithoutAddress,
-                    password: await bcrypt.hash(fakerUserData.password, 10),
                 },
             });
             createdUsers.push(user);

@@ -5,7 +5,6 @@ export const users: Prisma.UserCreateManyInput[] = [
     {
         id: 'd2c89e50-1b27-4b6a-b8a6-8a3b5f85df50',
         email: 'admin@template.fr',
-        password: 'adminPassword',
         firstName: 'admin',
         lastName: 'Garnier',
         role: Role.ADMIN,
@@ -18,7 +17,6 @@ export const users: Prisma.UserCreateManyInput[] = [
     {
         id: 'bf0596a2-149e-42b7-94de-0a10774280eb',
         email: 'user@app.com',
-        password: 'userPassword',
         firstName: 'SDR',
         lastName: 'App',
         role: Role.GYM_OWNER,
@@ -31,7 +29,6 @@ export const users: Prisma.UserCreateManyInput[] = [
     {
         id: 'bf0596a2-149e-42b7-94de-0a10774280ec',
         email: 'contact@app.com',
-        password: 'adminPassword',
         firstName: 'Contact',
         lastName: 'App',
         role: Role.CLIENT,
@@ -47,7 +44,6 @@ export const fakerUser = (): Prisma.UserCreateManyInput => {
     return {
         id: faker.string.uuid(),
         email: faker.internet.email(),
-        password: 'userPassword',
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         phone: faker.phone.number(),

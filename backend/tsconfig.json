@@ -32,9 +32,6 @@
       "@shared/*": [
         "../shared/*"
       ],
-      "@template-emails/*": [
-        "./template-emails/*"
-      ]
     }
   },
   "include": [

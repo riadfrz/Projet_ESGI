@@ -1,37 +1,69 @@
-import 'dotenv/config';
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
+import { configureRateLimiter, errorHandlerMiddleware, httpLoggerMiddleware } from '@/middleware';
+import dotenv from 'dotenv';
+import Fastify, { FastifyInstance } from 'fastify';
+import { corsConfig } from './config/cors';
+import prisma from './config/prisma';
+import { registerRoutes } from './routes/registerRoutes';
+import { initSwagger } from './utils/swaggerUtils';
 
-const fastify = Fastify({
-  logger: true,
-});
+// Chargement des variables d'environnement
+dotenv.config();
 
-// Register CORS
-await fastify.register(cors, {
-  origin: true,
-});
+/**
+ * Fonction pour construire et configurer l'instance Fastify
+ */
+export const buildApp = async (): Promise<FastifyInstance> => {
+  const app = Fastify({
+    logger: false,
+  });
 
-// Health check route
-fastify.get('/health', async () => {
-  return { status: 'ok', timestamp: new Date().toISOString() };
-});
+  // Plugins
+  corsConfig(app);
+  configureRateLimiter(app);
+  errorHandlerMiddleware(app);
+  initSwagger(app);
 
-// API routes
-fastify.get('/api', async () => {
-  return { message: 'Welcome to Projet ESGI API' };
-});
+  // Middleware de log
+  app.addHook('preHandler', httpLoggerMiddleware);
 
-const start = async () => {
+  // Enregistrement des routes
+  registerRoutes(app);
+
+  // Route de base
+  app.get('/', async () => {
+    return { message: "Bienvenue sur l'API Fastify avec Prisma et MySQL." };
+  });
+
+  // Initialisation de Minio
+
+  // Initialisation des paramètres de l'application
+
+  return app;
+};
+
+/**
+ * Fonction pour démarrer le serveur
+ */
+const startServer = async () => {
+  const app = await buildApp();
+  const port = parseInt(process.env.PORT || '3000', 10);
+  const env = process.env.NODE_ENV;
+
   try {
-    const port = Number(process.env.PORT) || 3000;
-    const host = process.env.HOST || '0.0.0.0';
+    // Utiliser 'localhost' plutôt que '0.0.0.0' pour le débogage
+    await app.listen({ port, host: 'localhost' });
+    console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
+    console.log(`💻 Environnement: ${env || 'development'}`);
 
-    await fastify.listen({ port, host });
-    console.log(`Server is running on http://${host}:${port}`);
+
   } catch (err) {
-    fastify.log.error(err);
+    console.error('Erreur lors du démarrage du serveur:', err);
+    app.log.error(err);
     process.exit(1);
   }
 };
 
-start();
+// Ne démarrer le serveur que si ce fichier est exécuté directement
+if (require.main === module) {
+  startServer();
+}

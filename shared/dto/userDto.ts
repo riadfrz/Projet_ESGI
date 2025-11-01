@@ -9,7 +9,6 @@ export const userSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    password: z.string().optional(),
     phone: z.string().optional(),
     civility: z.string().optional(),
     roles: z.array(z.nativeEnum(UserRole)).optional(),
