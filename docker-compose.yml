@@ -29,6 +29,31 @@ services:
         networks:
             - app_network
 
+    loki:
+        container_name: project_loki
+        image: grafana/loki:latest
+        ports:
+            - "${LOKI_PORT:-3100}:3100"
+        volumes:
+            - ./backend/loki-config.yaml:/etc/loki/local-config.yaml
+        command: -config.file=/etc/loki/local-config.yaml
+        networks:
+            - app_network
+
+    grafana:
+        container_name: project_grafana
+        image: grafana/grafana:latest
+        ports:
+            - "${GRAFANA_PORT:-3001}:3000" # Grafana sur le port 3001 pour éviter un conflit avec l'API
+        environment:
+            - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+        volumes:
+            - grafana-storage:/var/lib/grafana
+        depends_on:
+            - loki
+        networks:
+            - app_network
+
 networks:
     app_network:
         driver: bridge
