@@ -1,0 +1,12 @@
+model ExerciseMuscle {
+    id         String @id @default(uuid())
+    exerciseId String
+    muscleId   String
+
+    // Relations
+    exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+    muscle   Muscle   @relation(fields: [muscleId], references: [id], onDelete: Cascade)
+
+    @@unique([exerciseId, muscleId])
+    @@map("exercise_muscles")
+}

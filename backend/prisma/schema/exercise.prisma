@@ -1,0 +1,24 @@
+// Enum lié à Exercise
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+// Model Exercise
+model Exercise {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  difficulty  Difficulty @default(BEGINNER)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  exerciseMuscles    ExerciseMuscle[]
+  challengeExercises ChallengeExercise[]
+  trainingSessions   TrainingSession[]
+  pictures           ExercisePicture[]
+
+  @@map("exercises")
+}

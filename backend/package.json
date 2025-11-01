@@ -19,9 +19,6 @@
     "prisma:studio": "prisma studio --schema=prisma/schema",
     "format": "prettier --write \"src/**/*.{ts,js,json}\" --config .prettierrc"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",
     "@fastify/cors": "^10.0.1",

@@ -1,0 +1,21 @@
+model TrainingSession {
+    id             String   @id @default(uuid())
+    userId         String
+    challengeId    String?
+    gymId          String?
+    exerciseId     String
+    duration       Int
+    caloriesBurned Float?
+    repetitions    Int?
+    notes          String?
+    date           DateTime
+    createdAt      DateTime @default(now())
+
+    // Relations
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    challenge Challenge? @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+    gym       Gym?       @relation(fields: [gymId], references: [id], onDelete: SetNull)
+    exercise  Exercise   @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+    @@map("training_sessions")
+}

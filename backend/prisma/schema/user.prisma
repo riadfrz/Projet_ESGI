@@ -1,20 +1,38 @@
+// Enums liés à User
 enum Civility {
-  Mr
-  Mrs
+  MR
+  MRS
+  OTHER
 }
 
+enum Role {
+  CLIENT
+  GYM_OWNER
+  ADMIN
+}
+
+// Model User
 model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  password         String
-  firstName        String
-  lastName         String
-  phone            String?
-  civility         Civility?
-  birthDate        String?
-  roles            Json    // Store as JSON string or comma-separated
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  civility  Civility?
+  birthDate DateTime?
+  role      Role      @default(CLIENT)
+  points    Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  gyms                  Gym[]
+  createdChallenges     Challenge[]            @relation("ChallengeCreator")
+  challengeParticipants ChallengeParticipant[]
+  trainingSessions      TrainingSession[]
+  userBadges            UserBadge[]
 
   @@map("users")
 }

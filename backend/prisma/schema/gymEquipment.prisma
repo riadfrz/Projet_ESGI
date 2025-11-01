@@ -1,0 +1,12 @@
+model GymEquipment {
+    id        String   @id @default(uuid())
+    gymId     String
+    name      String
+    quantity  Int      @default(1)
+    createdAt DateTime @default(now())
+
+    // Relations
+    gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+    @@map("gym_equipments")
+}

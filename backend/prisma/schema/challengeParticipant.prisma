@@ -1,0 +1,25 @@
+// Enum lié à ChallengeParticipant
+enum ParticipantStatus {
+    INVITED
+    ACCEPTED
+    COMPLETED
+    FAILED
+}
+
+// Model ChallengeParticipant
+model ChallengeParticipant {
+    id          String            @id @default(uuid())
+    challengeId String
+    userId      String
+    status      ParticipantStatus @default(INVITED)
+    progress    Int               @default(0)
+    joinedAt    DateTime          @default(now())
+    completedAt DateTime?
+
+    // Relations
+    challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([challengeId, userId])
+    @@map("challenge_participants")
+}

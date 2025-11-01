@@ -1,7 +1,5 @@
-import { Prisma } from '@/config/client';
+import { Prisma, Civility, Role } from '@/config/client';
 import { faker } from '@faker-js/faker';
-
-import { UserRole, CivilityEnum } from '@shared/enums';
 
 export const users: Prisma.UserCreateManyInput[] = [
     {
@@ -10,10 +8,10 @@ export const users: Prisma.UserCreateManyInput[] = [
         password: 'adminPassword',
         firstName: 'admin',
         lastName: 'Garnier',
-        roles: JSON.stringify([UserRole.ADMIN]),
+        role: Role.ADMIN,
         phone: faker.phone.number(),
-        civility: faker.helpers.arrayElement([CivilityEnum.Mr, CivilityEnum.Mrs]),
-        birthDate: faker.date.past().toISOString(),
+        civility: Civility.MRS,
+        birthDate: faker.date.past(),
         createdAt: new Date('2023-01-01T10:00:00Z'),
         updatedAt: new Date('2023-01-01T10:00:00Z'),
     },
@@ -23,10 +21,10 @@ export const users: Prisma.UserCreateManyInput[] = [
         password: 'userPassword',
         firstName: 'SDR',
         lastName: 'App',
-        roles: JSON.stringify([UserRole.MODERATOR]),
+        role: Role.GYM_OWNER,
         phone: faker.phone.number(),
-        civility: faker.helpers.arrayElement([CivilityEnum.Mr, CivilityEnum.Mrs]),
-        birthDate: faker.date.past().toISOString(),
+        civility: Civility.MR,
+        birthDate: faker.date.past(),
         createdAt: new Date('2023-01-02T10:00:00Z'),
         updatedAt: new Date('2023-01-02T10:00:00Z'),
     },
@@ -36,10 +34,10 @@ export const users: Prisma.UserCreateManyInput[] = [
         password: 'adminPassword',
         firstName: 'Contact',
         lastName: 'App',
-        roles: JSON.stringify([UserRole.USER]),
+        role: Role.CLIENT,
         phone: faker.phone.number(),
-        civility: faker.helpers.arrayElement([CivilityEnum.Mr, CivilityEnum.Mrs]),
-        birthDate: faker.date.past().toISOString(),
+        civility: Civility.OTHER,
+        birthDate: faker.date.past(),
         createdAt: new Date('2023-01-02T10:00:00Z'),
         updatedAt: new Date('2023-01-02T10:00:00Z'),
     }
@@ -53,9 +51,9 @@ export const fakerUser = (): Prisma.UserCreateManyInput => {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         phone: faker.phone.number(),
-        civility: faker.helpers.arrayElement([CivilityEnum.Mr, CivilityEnum.Mrs]),
-        birthDate: faker.date.past().toISOString(),
-        roles: [JSON.stringify([UserRole.USER])],
+        civility: faker.helpers.arrayElement([Civility.MR, Civility.MRS, Civility.OTHER]),
+        birthDate: faker.date.past(),
+        role: Role.CLIENT,
         createdAt: faker.date.recent(),
         updatedAt: faker.date.recent(),
     };

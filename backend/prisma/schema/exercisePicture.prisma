@@ -1,0 +1,12 @@
+model ExercisePicture {
+    id         String   @id @default(uuid())
+    exerciseId String
+    url        String
+    order      Int      @default(0)
+    createdAt  DateTime @default(now())
+
+    // Relations
+    exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+    @@map("exercise_pictures")
+}

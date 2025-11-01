@@ -1,0 +1,12 @@
+model ChallengeExercise {
+    id          String @id @default(uuid())
+    challengeId String
+    exerciseId  String
+
+    // Relations
+    challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+    exercise  Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+    @@unique([challengeId, exerciseId])
+    @@map("challenge_exercises")
+}

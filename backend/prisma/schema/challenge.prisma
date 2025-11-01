@@ -1,0 +1,41 @@
+// Enums liés à Challenge
+enum ChallengeDifficulty {
+    EASY
+    MEDIUM
+    HARD
+}
+
+enum ChallengeStatus {
+    ACTIVE
+    COMPLETED
+    CANCELLED
+}
+
+// Model Challenge
+model Challenge {
+    id              String              @id @default(uuid())
+    title           String
+    description     String?
+    createdBy       String
+    gymId           String?
+    duration        Int
+    difficulty      ChallengeDifficulty @default(MEDIUM)
+    objectiveType   String
+    objectiveValue  Float
+    startDate       DateTime
+    endDate         DateTime
+    status          ChallengeStatus     @default(ACTIVE)
+    maxParticipants Int?
+    isPublic        Boolean             @default(true)
+    createdAt       DateTime            @default(now())
+    updatedAt       DateTime            @updatedAt
+
+    // Relations
+    creator               User                   @relation("ChallengeCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+    gym                   Gym?                   @relation(fields: [gymId], references: [id], onDelete: SetNull)
+    challengeExercises    ChallengeExercise[]
+    challengeParticipants ChallengeParticipant[]
+    trainingSessions      TrainingSession[]
+
+    @@map("challenges")
+}
