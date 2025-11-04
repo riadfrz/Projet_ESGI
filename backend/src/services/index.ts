@@ -1,0 +1,1 @@
+// AuthService removed - now using @fastify/oauth2 instead of Better Auth

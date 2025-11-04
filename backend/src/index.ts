@@ -5,6 +5,9 @@ import { corsConfig } from './config/cors';
 import prisma from './config/prisma';
 import { registerRoutes } from './routes/registerRoutes';
 import { initSwagger } from './utils/swaggerUtils';
+import cookie from '@fastify/cookie';
+import googleOAuthPlugin from './plugins/google-oauth';
+
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -17,6 +20,11 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     logger: false,
   });
 
+  await app.register(cookie);
+
+  // OAuth Plugin
+  await app.register(googleOAuthPlugin);
+
   // Plugins
   corsConfig(app);
   configureRateLimiter(app);
@@ -27,7 +35,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   app.addHook('preHandler', httpLoggerMiddleware);
 
   // Enregistrement des routes
-  registerRoutes(app);
+  await registerRoutes(app);
 
   // Route de base
   app.get('/', async () => {

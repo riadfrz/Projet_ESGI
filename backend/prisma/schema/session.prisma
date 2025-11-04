@@ -1,0 +1,22 @@
+enum AuthProvider {
+    GOOGLE
+    APPLE
+    MAGIC_LINK
+    EMAIL_PASSWORD
+}
+
+model Session {
+    id           String       @id
+    expiresAt    DateTime
+    token        String       @unique
+    createdAt    DateTime     @default(now())
+    updatedAt    DateTime     @updatedAt
+    ipAddress    String?
+    userAgent    String?
+    authProvider AuthProvider @default(EMAIL_PASSWORD)
+    userId       String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
+}
+
