@@ -4,7 +4,7 @@ import {
     UpsertUserFromOAuthParamsDto, 
     UpsertOAuthAccountParamsDto, 
     CreateSessionParamsDto 
-} from "@shared/dto/authDto";
+} from "@shared/dto";
 
 class AuthRepository {
     constructor() { }
