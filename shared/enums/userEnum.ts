@@ -1,10 +1,11 @@
 export enum UserRole {
-    USER = 'USER',
+    CLIENT = 'CLIENT',
     GYM_OWNER = 'GYM_OWNER',
     ADMIN = 'ADMIN',
 }
 
 export enum CivilityEnum {
-    Mr = 'Mr',
-    Mrs = 'Mrs',
+    MR = 'MR',
+    MRS = 'MRS',
+    OTHER = 'OTHER',
 }

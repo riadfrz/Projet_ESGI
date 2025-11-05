@@ -1,6 +1,6 @@
 import { Serialize } from '@shared/types/Serialize';
 import { z } from 'zod';
-import { UserRole } from '@shared/enums';
+import { UserRole, CivilityEnum } from '@shared/enums';
 
 
 
@@ -9,12 +9,14 @@ export const userSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    phone: z.string().optional(),
-    civility: z.string().optional(),
-    roles: z.array(z.nativeEnum(UserRole)).optional(),
+    phone: z.string().nullable().optional(),
+    civility: z.nativeEnum(CivilityEnum).nullable().optional(),
+    birthDate: z.string().nullable().optional(),
+    role: z.nativeEnum(UserRole),
+    points: z.number(),
     createdAt: z.string(),
     updatedAt: z.string(),
-    isVerified: z.boolean().optional(),
+    deletedAt: z.string().nullable().optional(),
 });
 
 export type UserSchema = z.infer<typeof userSchema>;
@@ -25,8 +27,8 @@ export const restrictedUserSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    civility: z.string().optional(),
-    roles: z.array(z.nativeEnum(UserRole)).optional(),
+    civility: z.nativeEnum(CivilityEnum).nullable().optional(),
+    role: z.nativeEnum(UserRole),
 });
 
 export type RestrictedUserSchema = z.infer<typeof restrictedUserSchema>;
@@ -36,8 +38,7 @@ export const queryUsersSchema = z.object({
     page: z.string().min(1, 'Le numéro de page doit être supérieur à 0').optional(),
     limit: z.string().min(1, "Le nombre d'éléments par page doit être supérieur à 0").optional(),
     search: z.string().optional(),
-    roles: z.array(z.nativeEnum(UserRole)).optional(),
-
+    role: z.nativeEnum(UserRole).optional(),
 });
 
 export type QueryUsersSchema = z.infer<typeof queryUsersSchema>;
@@ -54,13 +55,14 @@ export type QueryChatContactsSchema = z.infer<typeof queryChatContactsSchema>;
 export type QueryChatContactsDto = Serialize<QueryChatContactsSchema>;
 
 export const updateUserSchema = z.object({
-    email: z.string().email("Format d'email invalide"),
-    firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
-    lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-    phone: z.string().optional(),
-    civility: z.string().optional(),
-    roles: z.array(z.nativeEnum(UserRole)).optional(),
-    isVerified: z.boolean().optional(),
+    email: z.string().email("Format d'email invalide").optional(),
+    firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères').optional(),
+    lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').optional(),
+    phone: z.string().nullable().optional(),
+    civility: z.nativeEnum(CivilityEnum).nullable().optional(),
+    birthDate: z.string().nullable().optional(),
+    role: z.nativeEnum(UserRole).optional(),
+    points: z.number().optional(),
 });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
@@ -91,14 +93,14 @@ export const basicUserSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    civility: z.string().optional(),
+    civility: z.nativeEnum(CivilityEnum).nullable().optional(),
 });
 
 export type BasicUserSchema = z.infer<typeof basicUserSchema>;
 export type BasicUserDto = Serialize<BasicUserSchema>;
 
 export const contactUserSchema = basicUserSchema.extend({
-    roles: z.array(z.nativeEnum(UserRole)).optional(),
+    role: z.nativeEnum(UserRole),
     isOnline: z.boolean().optional(),
     lastSeen: z.string().optional(),
     unreadCount: z.number().optional(),
@@ -121,3 +123,15 @@ export const contactsResponseSchema = z.object({
 
 export type ContactsResponseSchema = z.infer<typeof contactsResponseSchema>;
 export type ContactsResponse = Serialize<ContactsResponseSchema>;
+
+// ============================================================================
+// Current User Response (for authenticated user)
+// ============================================================================
+
+export const currentUserResponseSchema = basicUserSchema.extend({
+    role: z.nativeEnum(UserRole),
+    createdAt: z.string(),
+});
+
+export type CurrentUserResponseSchema = z.infer<typeof currentUserResponseSchema>;
+export type CurrentUserResponseDto = Serialize<CurrentUserResponseSchema>;
