@@ -1,2 +1,3 @@
 export * from './userEnum';
 export * from './authEnum';
+export * from './gymEnum';
