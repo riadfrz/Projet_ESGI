@@ -5,3 +5,5 @@ export * from './responseDto';
 export * from './oauthDto';
 export * from './gymDto';
 export * from './equipmentDto';
+export * from './exerciseDto';
+export * from './muscleDto';
