@@ -3,9 +3,9 @@ model Account {
     userId                String
     accountId             String
     providerId            String
-    accessToken           String?
-    refreshToken          String?
-    idToken               String?
+    accessToken           String?   @db.Text
+    refreshToken          String?   @db.Text
+    idToken               String?   @db.Text
     accessTokenExpiresAt  DateTime?
     refreshTokenExpiresAt DateTime?
     scope                 String?
