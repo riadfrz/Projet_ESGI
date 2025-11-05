@@ -1,4 +1,4 @@
-import { authRepository } from "@/repositories";
+import { authRepository } from "@/features/auth";
 import { asyncHandler } from "@/utils";
 import { jsonResponse } from "@/utils/jsonResponse";
 import { logger } from "@/utils/logger";
@@ -15,6 +15,7 @@ class AuthController {
      * Get current authenticated user
      */
     public getCurrentUser = asyncHandler({
+
         logger: this.logger,
         handler: async (request, reply) => {
             const sessionToken = request.cookies.session; // Better Auth uses cookies

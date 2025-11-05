@@ -16,7 +16,7 @@
         "*.log",
         "logs/*"
     ],
-    "exec": "node -r @swc-node/register -r tsconfig-paths/register src/index.ts",
+    "exec": "tsx --tsconfig tsconfig.json src/index.ts",
     "delay": "500",
     "env": {
         "NODE_ENV": "development",

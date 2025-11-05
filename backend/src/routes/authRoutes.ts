@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { authController } from "@/controllers/authController";
+import { authController } from "@/features/auth";
 import { createSwaggerSchema } from "@/utils/swaggerUtils";
 
 export default async function authRoutes(app: FastifyInstance) {
