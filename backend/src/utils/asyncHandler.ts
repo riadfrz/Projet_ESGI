@@ -134,8 +134,11 @@ export function asyncHandler<TBody = unknown, TQuery = unknown, TParams = unknow
 
             // Validation du body
             if (bodySchema) {
+                // Vérifier si la requête est multipart en vérifiant le content-type
+                const isMultipart = request.headers['content-type']?.includes('multipart/form-data');
+
                 // Convertir les champs de type 'field' en valeurs simples uniquement si la requête est multipart
-                const processedBody = request.isMultipart()
+                const processedBody = isMultipart
                     ? Object.fromEntries(
                         Object.entries(request.body as any).map(([key, value]: any) => [
                             key,
@@ -199,7 +202,18 @@ export function asyncHandler<TBody = unknown, TQuery = unknown, TParams = unknow
             await handler(request, reply);
         } catch (error) {
             const loggerToUse = typeof options === 'function' ? logger : options.logger || logger;
-            loggerToUse.error('Error in request handler', error);
+
+            // Log the complete error with stack trace
+            if (error instanceof Error) {
+                loggerToUse.error({
+                    err: error,
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name,
+                }, 'Error in request handler');
+            } else {
+                loggerToUse.error({ error }, 'Error in request handler');
+            }
 
             if (error instanceof z.ZodError) {
                 jsonResponse<ValidationErrorDto[]>(

@@ -24,8 +24,23 @@ const createTransports = () => {
     return lokiTransport;
 };
 
-// Logger principal qui enverra les logs à Loki mais pas à la console
-export const logger: Logger = pino({ level: process.env.LOG_LEVEL || 'debug' }, createTransports());
+// Logger principal - En développement, affiche aussi en console, en production envoie uniquement à Loki
+export const logger: Logger = pino(
+    {
+        level: process.env.LOG_LEVEL || 'debug',
+        transport: process.env.NODE_ENV === 'development'
+            ? {
+                target: 'pino-pretty',
+                options: {
+                    translateTime: 'HH:MM:ss Z',
+                    ignore: 'pid,hostname',
+                    colorize: true,
+                },
+            }
+            : undefined,
+    },
+    process.env.NODE_ENV === 'production' ? createTransports() : undefined
+);
 
 // Logger spécifique pour les logs applicatifs (non HTTP) qui seront affichés en console
 export const appLogger = pino({
