@@ -1,15 +1,21 @@
 import { FastifyInstance } from "fastify";
 import { gymController } from "@/features/gym";
 import { createSwaggerSchema } from "@/utils/swaggerUtils";
+import { isAuthenticated } from "@/middleware/authenticate";
+import { hasRole } from "@/middleware/authorize";
+import { UserRole } from "@shared/enums/userEnum";
 
 export default async function gymRoutes(app: FastifyInstance) {
-    // Create gym (ADMIN or GYM_OWNER)
+    // Create gym (GYM_OWNER or ADMIN) - Creates with PENDING status
     app.post('/', {
+        preHandler: [isAuthenticated, hasRole(UserRole.GYM_OWNER)],
         schema: createSwaggerSchema(
             "Créer une nouvelle salle de sport",
             [
                 { message: 'Salle de sport créée avec succès', data: {}, status: 201 },
                 { message: 'Données invalides', data: {}, status: 400 },
+                { message: 'Non authentifié', data: {}, status: 401 },
+                { message: 'Accès refusé', data: {}, status: 403 },
             ],
             null,
             true,
@@ -50,14 +56,16 @@ export default async function gymRoutes(app: FastifyInstance) {
         handler: gymController.getGymById,
     });
 
-    // Update gym (ADMIN or gym owner)
+    // Update gym (GYM_OWNER for their own gym, or ADMIN)
     app.put('/:id', {
+        preHandler: [isAuthenticated, hasRole(UserRole.GYM_OWNER)],
         schema: createSwaggerSchema(
             "Mettre à jour une salle de sport",
             [
                 { message: 'Salle de sport mise à jour', data: {}, status: 200 },
                 { message: 'Salle de sport introuvable', data: {}, status: 404 },
                 { message: 'Non autorisé', data: {}, status: 403 },
+                { message: 'Non authentifié', data: {}, status: 401 },
             ],
             null,
             true,
@@ -69,12 +77,14 @@ export default async function gymRoutes(app: FastifyInstance) {
 
     // Update gym status - Approve/Reject (ADMIN only)
     app.patch('/:id/status', {
+        preHandler: [isAuthenticated, hasRole(UserRole.ADMIN)],
         schema: createSwaggerSchema(
             "Approuver ou rejeter une salle de sport (ADMIN)",
             [
                 { message: 'Statut de la salle de sport mis à jour', data: {}, status: 200 },
                 { message: 'Salle de sport introuvable', data: {}, status: 404 },
                 { message: 'Non autorisé', data: {}, status: 403 },
+                { message: 'Non authentifié', data: {}, status: 401 },
             ],
             null,
             true,
@@ -86,12 +96,14 @@ export default async function gymRoutes(app: FastifyInstance) {
 
     // Delete gym (ADMIN only)
     app.delete('/:id', {
+        preHandler: [isAuthenticated, hasRole(UserRole.ADMIN)],
         schema: createSwaggerSchema(
             "Supprimer une salle de sport (ADMIN)",
             [
                 { message: 'Salle de sport supprimée', data: {}, status: 200 },
                 { message: 'Salle de sport introuvable', data: {}, status: 404 },
                 { message: 'Non autorisé', data: {}, status: 403 },
+                { message: 'Non authentifié', data: {}, status: 401 },
             ],
             null,
             true,

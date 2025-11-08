@@ -15,6 +15,7 @@ export default async function authRoutes(app: FastifyInstance) {
             null,
             ['Auth']
         ),
+        
         handler: authController.handleGoogleCallback,
     });
 
