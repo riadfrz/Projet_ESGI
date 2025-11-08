@@ -33,29 +33,48 @@ class GymController {
         bodySchema: createGymSchema,
         logger: this.logger,
         handler: async (request, reply): Promise<ApiResponse<GymDto | void> | void> => {
-            const data = request.body;
+            try {
+                const data = request.body;
+                const currentUser = request.user;
 
-            // TODO: Add authentication middleware to get current user
-            // For GYM_OWNER, set ownerId from authenticated user
-            // For ADMIN, allow ownerId to be specified in the body
+                this.logger.info('Creating gym with data:', { data, user: currentUser?.email });
 
-            const gym = await gymRepository.create({
-                name: data.name,
-                description: data.description,
-                address: data.address,
-                city: data.city,
-                zipCode: data.zipCode,
-                country: data.country,
-                phone: data.phone,
-                email: data.email,
-                capacity: data.capacity,
-                owner: {
-                    connect: { id: data.ownerId! }
-                },
-            });
+                if (!currentUser) {
+                    return jsonResponse(reply, 'Non authentifié', undefined, 401);
+                }
 
-            const gymDto = gymTransform.toGymDto(gym);
-            return jsonResponse(reply, 'Salle de sport créée avec succès', gymDto, 201);
+                // Determine ownerId:
+                // - If ADMIN and ownerId provided in body, use it
+                // - Otherwise, use the authenticated user's ID
+                const ownerId = (currentUser.role === 'ADMIN' && data.ownerId)
+                    ? data.ownerId
+                    : currentUser.id;
+
+                this.logger.info('Owner ID determined:', { ownerId, userRole: currentUser.role });
+
+                const gym = await gymRepository.create({
+                    name: data.name,
+                    description: data.description,
+                    address: data.address,
+                    city: data.city,
+                    zipCode: data.zipCode,
+                    country: data.country,
+                    phone: data.phone,
+                    email: data.email,
+                    capacity: data.capacity,
+                    owner: {
+                        connect: { id: ownerId }
+                    },
+                });
+
+                this.logger.info('Gym created successfully:', { gymId: gym.id });
+
+                const gymDto = gymTransform.toGymDto(gym);
+                return jsonResponse(reply, 'Salle de sport créée avec succès', gymDto, 201);
+            } catch (error) {
+                this.logger.error('Error creating gym:', error);
+                throw error;
+            }
         },
     });
 

@@ -22,7 +22,12 @@ export const isAuthenticated = async (
     const sessionToken = req.cookies.session;
 
     if (!sessionToken) {
-        jsonResponse(res, 'Non authentifié', undefined, 401);
+        await res.status(401).send({
+            message: 'Non authentifié',
+            data: undefined,
+            status: 401,
+            timestamp: new Date().toISOString(),
+        });
         return;
     }
 
@@ -30,13 +35,23 @@ export const isAuthenticated = async (
         const user = await authRepository.getCurrentUser(sessionToken);
 
         if (!user) {
-            jsonResponse(res, 'Session invalide ou expirée', undefined, 401);
+            await res.status(401).send({
+                message: 'Session invalide ou expirée',
+                data: undefined,
+                status: 401,
+                timestamp: new Date().toISOString(),
+            });
             return;
         }
 
         // Attach user to request for downstream handlers
         req.user = user;
     } catch (error) {
-        jsonResponse(res, 'Erreur d\'authentification', undefined, 401);
+        await res.status(401).send({
+            message: 'Erreur d\'authentification',
+            data: undefined,
+            status: 401,
+            timestamp: new Date().toISOString(),
+        });
     }
 };

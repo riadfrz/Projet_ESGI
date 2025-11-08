@@ -1,0 +1,615 @@
+{
+  "info": {
+    "name": "Projet ESGI - API Collection",
+    "_postman_id": "projet-esgi-api",
+    "description": "Complete API collection for testing authentication and all routes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Dev Login - CLIENT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"client@test.com\",\n  \"role\": \"CLIENT\",\n  \"firstName\": \"Client\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/dev-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "dev-login"]
+            },
+            "description": "Login as CLIENT for testing"
+          }
+        },
+        {
+          "name": "Dev Login - GYM_OWNER",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner@test.com\",\n  \"role\": \"GYM_OWNER\",\n  \"firstName\": \"Gym\",\n  \"lastName\": \"Owner\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/dev-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "dev-login"]
+            },
+            "description": "Login as GYM_OWNER for testing"
+          }
+        },
+        {
+          "name": "Dev Login - ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@test.com\",\n  \"role\": \"ADMIN\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/dev-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "dev-login"]
+            },
+            "description": "Login as ADMIN for testing"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get currently authenticated user"
+          }
+        },
+        {
+          "name": "Get My Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/sessions",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "sessions"]
+            },
+            "description": "Get all sessions for current user"
+          }
+        },
+        {
+          "name": "Revoke Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/sessions/:sessionId",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "sessions", ":sessionId"],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "session_123",
+                  "description": "Session ID to revoke"
+                }
+              ]
+            },
+            "description": "Revoke a specific session"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout and clear current session"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gyms",
+      "item": [
+        {
+          "name": "Create Gym",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"FitZone Paris\",\n  \"description\": \"Modern gym in the heart of Paris\",\n  \"address\": \"123 Rue de la Paix\",\n  \"city\": \"Paris\",\n  \"zipCode\": \"75001\",\n  \"country\": \"France\",\n  \"phone\": \"+33123456789\",\n  \"email\": \"contact@fitzone.com\",\n  \"capacity\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gyms",
+              "host": ["{{base_url}}"],
+              "path": ["gyms"]
+            },
+            "description": "Create a new gym (GYM_OWNER or ADMIN)"
+          }
+        },
+        {
+          "name": "Get All Gyms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gyms",
+              "host": ["{{base_url}}"],
+              "path": ["gyms"]
+            },
+            "description": "Get all approved gyms (Public)"
+          }
+        },
+        {
+          "name": "Get Gym by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gyms/:id",
+              "host": ["{{base_url}}"],
+              "path": ["gyms", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Gym ID"
+                }
+              ]
+            },
+            "description": "Get gym by ID (Public)"
+          }
+        },
+        {
+          "name": "Update Gym",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"FitZone Paris Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gyms/:id",
+              "host": ["{{base_url}}"],
+              "path": ["gyms", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Gym ID"
+                }
+              ]
+            },
+            "description": "Update gym (GYM_OWNER for own gym, or ADMIN)"
+          }
+        },
+        {
+          "name": "Approve/Reject Gym",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gyms/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["gyms", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Gym ID"
+                }
+              ]
+            },
+            "description": "Approve or reject gym (ADMIN only) - status: APPROVED, REJECTED, PENDING"
+          }
+        },
+        {
+          "name": "Delete Gym",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gyms/:id",
+              "host": ["{{base_url}}"],
+              "path": ["gyms", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Gym ID"
+                }
+              ]
+            },
+            "description": "Delete gym (ADMIN only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Create Exercise",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bench Press\",\n  \"description\": \"Classic chest exercise\",\n  \"difficulty\": \"INTERMEDIATE\",\n  \"category\": \"STRENGTH\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/exercises",
+              "host": ["{{base_url}}"],
+              "path": ["exercises"]
+            },
+            "description": "Create exercise (ADMIN only)"
+          }
+        },
+        {
+          "name": "Get All Exercises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/exercises",
+              "host": ["{{base_url}}"],
+              "path": ["exercises"]
+            },
+            "description": "Get all exercises (Public)"
+          }
+        },
+        {
+          "name": "Get Exercise by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/exercises/:id",
+              "host": ["{{base_url}}"],
+              "path": ["exercises", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Exercise ID"
+                }
+              ]
+            },
+            "description": "Get exercise by ID (Public)"
+          }
+        },
+        {
+          "name": "Update Exercise",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bench Press Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/exercises/:id",
+              "host": ["{{base_url}}"],
+              "path": ["exercises", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Exercise ID"
+                }
+              ]
+            },
+            "description": "Update exercise (ADMIN only)"
+          }
+        },
+        {
+          "name": "Delete Exercise",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/exercises/:id",
+              "host": ["{{base_url}}"],
+              "path": ["exercises", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Exercise ID"
+                }
+              ]
+            },
+            "description": "Delete exercise (ADMIN only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Muscles",
+      "item": [
+        {
+          "name": "Create Muscle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pectoraux\",\n  \"description\": \"Muscles de la poitrine\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/muscles",
+              "host": ["{{base_url}}"],
+              "path": ["muscles"]
+            },
+            "description": "Create muscle group (ADMIN only)"
+          }
+        },
+        {
+          "name": "Get All Muscles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/muscles",
+              "host": ["{{base_url}}"],
+              "path": ["muscles"]
+            },
+            "description": "Get all muscles (Public)"
+          }
+        },
+        {
+          "name": "Get Muscle by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/muscles/:id",
+              "host": ["{{base_url}}"],
+              "path": ["muscles", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Muscle ID"
+                }
+              ]
+            },
+            "description": "Get muscle by ID (Public)"
+          }
+        },
+        {
+          "name": "Update Muscle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pectoraux Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/muscles/:id",
+              "host": ["{{base_url}}"],
+              "path": ["muscles", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Muscle ID"
+                }
+              ]
+            },
+            "description": "Update muscle (ADMIN only)"
+          }
+        },
+        {
+          "name": "Delete Muscle",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/muscles/:id",
+              "host": ["{{base_url}}"],
+              "path": ["muscles", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Muscle ID"
+                }
+              ]
+            },
+            "description": "Delete muscle (ADMIN only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Equipment",
+      "item": [
+        {
+          "name": "Create Equipment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Treadmill\",\n  \"quantity\": 5,\n  \"gymId\": \"gym-id-here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/equipments",
+              "host": ["{{base_url}}"],
+              "path": ["equipments"]
+            },
+            "description": "Create equipment (GYM_OWNER or ADMIN)"
+          }
+        },
+        {
+          "name": "Get All Equipment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/equipments",
+              "host": ["{{base_url}}"],
+              "path": ["equipments"]
+            },
+            "description": "Get all equipment (Public)"
+          }
+        },
+        {
+          "name": "Get Equipment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/equipments/:id",
+              "host": ["{{base_url}}"],
+              "path": ["equipments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Equipment ID"
+                }
+              ]
+            },
+            "description": "Get equipment by ID (Public)"
+          }
+        },
+        {
+          "name": "Update Equipment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Treadmill Pro\",\n  \"quantity\": 7\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/equipments/:id",
+              "host": ["{{base_url}}"],
+              "path": ["equipments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Equipment ID"
+                }
+              ]
+            },
+            "description": "Update equipment (GYM_OWNER for own equipment, or ADMIN)"
+          }
+        },
+        {
+          "name": "Delete Equipment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/equipments/:id",
+              "host": ["{{base_url}}"],
+              "path": ["equipments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Equipment ID"
+                }
+              ]
+            },
+            "description": "Delete equipment (GYM_OWNER for own equipment, or ADMIN)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ]
+}

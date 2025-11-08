@@ -11,13 +11,18 @@ import { FastifyReply, FastifyRequest } from 'fastify';
  * @returns Fastify preHandler middleware
  */
 export const hasRole = (requiredRole: UserRole) => {
-    return (
+    return async (
         req: FastifyRequest,
         res: FastifyReply
-    ): void => {
+    ): Promise<void> => {
         // User should be set by isAuthenticated middleware
         if (!req.user) {
-            jsonResponse(res, 'Non authentifié', undefined, 401);
+            await res.status(401).send({
+                message: 'Non authentifié',
+                data: undefined,
+                status: 401,
+                timestamp: new Date().toISOString(),
+            });
             return;
         }
 
@@ -25,12 +30,12 @@ export const hasRole = (requiredRole: UserRole) => {
 
         // Check if user's role satisfies the required role (including inheritance)
         if (!hasInheritedRole(userRole, requiredRole)) {
-            jsonResponse(
-                res,
-                'Accès refusé - Permissions insuffisantes',
-                undefined,
-                403
-            );
+            await res.status(403).send({
+                message: 'Accès refusé - Permissions insuffisantes',
+                data: undefined,
+                status: 403,
+                timestamp: new Date().toISOString(),
+            });
             return;
         }
 
