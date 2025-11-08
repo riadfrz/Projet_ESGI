@@ -2,9 +2,9 @@ import { UserRole } from '@shared/enums/userEnum';
 
 // Mapping de la hiérarchie : chaque rôle hérite directement des rôles listés
 export const roleHierarchy: { [key: string]: UserRole[] } = {
-    [UserRole.USER]: [],
-    [UserRole.MODERATOR]: [UserRole.USER],
-    [UserRole.ADMIN]: [UserRole.USER, UserRole.MODERATOR],
+    [UserRole.CLIENT]: [],
+    [UserRole.GYM_OWNER]: [UserRole.CLIENT],
+    [UserRole.ADMIN]: [UserRole.CLIENT, UserRole.GYM_OWNER],
 };
 
 // Fonction récursive pour vérifier l'héritage transitif des rôles
