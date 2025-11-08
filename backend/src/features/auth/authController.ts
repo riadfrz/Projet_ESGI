@@ -4,10 +4,10 @@ import { ApiResponse } from "@/types";
 import { asyncHandler } from "@/utils";
 import { jsonResponse } from "@/utils/jsonResponse";
 import { logger } from "@/utils/logger";
-import jwt from 'jsonwebtoken';
-import { 
-    CurrentUserResponseDto, 
-    GoogleProfileDto, 
+import crypto from 'crypto';
+import {
+    CurrentUserResponseDto,
+    GoogleProfileDto,
     MessageResponseDto,
     SessionResponseDto,
     UserDto,
@@ -86,6 +86,99 @@ class AuthController {
     });
 
     /**
+     * Development login (only for testing in non-production environments)
+     * Allows creating a session with just an email and optional role
+     */
+    public devLogin = asyncHandler<unknown, unknown, unknown, { sessionToken: string }>({
+        logger: this.logger,
+        handler: async (request, reply): Promise<ApiResponse<{ sessionToken: string } | void> | void> => {
+            // Only allow in development
+            if (process.env.NODE_ENV === 'production') {
+                return jsonResponse(reply, 'Endpoint disabled in production', undefined, 403);
+            }
+
+            const { email, role, firstName, lastName } = request.body as {
+                email: string;
+                role?: string;
+                firstName?: string;
+                lastName?: string;
+            };
+
+            if (!email) {
+                return jsonResponse(reply, 'Email is required', undefined, 400);
+            }
+
+            // Find or create user
+            let user = await authRepository.findUserByEmail(email);
+
+            if (!user) {
+                // Create new user for testing
+                user = await authRepository.createDevUser({
+                    email,
+                    firstName: firstName || 'Test',
+                    lastName: lastName || 'User',
+                    role: role || 'CLIENT',
+                });
+            } else if (role) {
+                // Update role if provided
+                user = await authRepository.updateUserRole(user.id, role);
+            }
+
+            // Generate secure random session token
+            const sessionToken = crypto.randomBytes(32).toString('hex');
+
+            // Create session in database
+            await authRepository.createSession({
+                userId: user.id,
+                token: sessionToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                ipAddress: request.ip,
+                userAgent: request.headers['user-agent'] || 'Postman/Dev',
+                authProvider: AuthProviderEnum.EMAIL_PASSWORD,
+            });
+
+            // Set secure HTTP-only cookie
+            reply.setCookie('session', sessionToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+                path: '/',
+            });
+
+            return jsonResponse(
+                reply,
+                'Dev session created successfully',
+                { sessionToken }, // Return token so you can copy it to Postman
+                200
+            );
+        },
+    });
+
+    /**
+     * Logout - revokes current session
+     */
+    public logout = asyncHandler<unknown, unknown, unknown, MessageResponseDto>({
+        logger: this.logger,
+        handler: async (request, reply): Promise<ApiResponse<MessageResponseDto | void> | void> => {
+            const sessionToken = request.cookies.session;
+
+            if (!sessionToken) {
+                return jsonResponse(reply, 'No active session', undefined, 401);
+            }
+
+            // Find and delete session
+            await authRepository.revokeSessionByToken(sessionToken);
+
+            // Clear cookie
+            reply.clearCookie('session', { path: '/' });
+
+            const response: MessageResponseDto = { message: 'Logged out successfully' };
+            return jsonResponse(reply, 'Logged out successfully', response, 200);
+        },
+    });
+
+    /**
      * Google OAuth callback handler
      */
     public handleGoogleCallback = asyncHandler<unknown, unknown, unknown, void>({
@@ -135,18 +228,8 @@ class AuthController {
                     scope: token.scope,
                 });
 
-                // Create JWT session token
-                const jwtSecret = process.env.JWT_SECRET || process.env.BETTER_AUTH_SECRET || 'fallback-secret';
-                const sessionToken = jwt.sign(
-                    {
-                        userId: user.id,
-                        email: user.email,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                    },
-                    jwtSecret,
-                    { expiresIn: '7d' }
-                );
+                // Generate secure random session token (64 characters)
+                const sessionToken = crypto.randomBytes(32).toString('hex');
 
                 // Create session in database using repository
                 await authRepository.createSession({

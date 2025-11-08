@@ -1,7 +1,7 @@
 import { jsonResponse } from '@/utils/jsonResponse';
 import { UserRole } from '@shared/enums/userEnum';
 import { hasInheritedRole } from '@/config/roles';
-import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 /**
  * Middleware factory to authorize users based on required role(s)
@@ -13,8 +13,7 @@ import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify';
 export const hasRole = (requiredRole: UserRole) => {
     return (
         req: FastifyRequest,
-        res: FastifyReply,
-        done: HookHandlerDoneFunction
+        res: FastifyReply
     ): void => {
         // User should be set by isAuthenticated middleware
         if (!req.user) {
@@ -36,6 +35,5 @@ export const hasRole = (requiredRole: UserRole) => {
         }
 
         // User is authorized, continue to route handler
-        done();
     };
 };

@@ -36,11 +36,58 @@ class AuthRepository {
     }
 
     /**
-     * Revoke a session
+     * Revoke a session by session ID
      */
     async revokeSession(sessionId: string) {
         return prisma.session.delete({
             where: { id: sessionId }
+        });
+    }
+
+    /**
+     * Revoke a session by token
+     */
+    async revokeSessionByToken(token: string) {
+        return prisma.session.delete({
+            where: { token }
+        });
+    }
+
+    /**
+     * Find user by email
+     */
+    async findUserByEmail(email: string): Promise<User | null> {
+        return prisma.user.findUnique({
+            where: { email }
+        });
+    }
+
+    /**
+     * Create a dev user (for testing purposes)
+     */
+    async createDevUser(params: {
+        email: string;
+        firstName: string;
+        lastName: string;
+        role: string;
+    }): Promise<User> {
+        return prisma.user.create({
+            data: {
+                email: params.email,
+                firstName: params.firstName,
+                lastName: params.lastName,
+                role: params.role as $Enums.Role,
+            }
+        });
+    }
+
+    /**
+     * Update user role
+     */
+    async updateUserRole(userId: string, role: string): Promise<User> {
+        return prisma.user.update({
+            where: { id: userId },
+            data: { role: role as $Enums.Role }
         });
     }
 

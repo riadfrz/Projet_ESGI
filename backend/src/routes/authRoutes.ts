@@ -3,6 +3,39 @@ import { authController } from "@/features/auth";
 import { createSwaggerSchema } from "@/utils/swaggerUtils";
 
 export default async function authRoutes(app: FastifyInstance) {
+    // Development login (only enabled in non-production)
+    app.post('/dev-login', {
+        schema: createSwaggerSchema(
+            "Login pour testing (DEV ONLY)",
+            [
+                { message: 'Dev session created successfully', data: {}, status: 200 },
+                { message: 'Email is required', data: {}, status: 400 },
+                { message: 'Endpoint disabled in production', data: {}, status: 403 },
+            ],
+            null,
+            false,
+            null,
+            ['Auth']
+        ),
+        handler: authController.devLogin,
+    });
+
+    // Logout
+    app.post('/logout', {
+        schema: createSwaggerSchema(
+            "Se déconnecter",
+            [
+                { message: 'Logged out successfully', data: {}, status: 200 },
+                { message: 'No active session', data: {}, status: 401 },
+            ],
+            null,
+            false,
+            null,
+            ['Auth']
+        ),
+        handler: authController.logout,
+    });
+
     // Google OAuth callback (registered before wildcard route)
     app.get('/google/callback', {
         schema: createSwaggerSchema(

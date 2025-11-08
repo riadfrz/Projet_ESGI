@@ -1,7 +1,7 @@
 import { jsonResponse } from '@/utils/jsonResponse';
 import { authRepository } from '@/features/auth';
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify';
-import { User } from '@prisma/client';
+import { User } from '@/config/client';
 
 declare module 'fastify' {
     interface FastifyRequest {
@@ -13,13 +13,11 @@ declare module 'fastify' {
  * Middleware to check if the user is authenticated via session cookie
  * @param req - Fastify request
  * @param res - Fastify response
- * @param done - Fastify done function
  * @returns void
  */
 export const isAuthenticated = async (
     req: FastifyRequest,
-    res: FastifyReply,
-    done: HookHandlerDoneFunction
+    res: FastifyReply
 ): Promise<void> => {
     const sessionToken = req.cookies.session;
 
@@ -38,7 +36,6 @@ export const isAuthenticated = async (
 
         // Attach user to request for downstream handlers
         req.user = user;
-        done();
     } catch (error) {
         jsonResponse(res, 'Erreur d\'authentification', undefined, 401);
     }
