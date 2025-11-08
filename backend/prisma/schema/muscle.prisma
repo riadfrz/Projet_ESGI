@@ -1,8 +1,8 @@
 model Muscle {
     id          String   @id @default(uuid())
-    name        String   @unique
+    name        String   @unique // Display name (e.g., "Abdominals", "Biceps")
     description String?
-    picture     String?
+    identifier  String   @unique // SVG identifier (e.g., "abdominals", "biceps", "chest")
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 

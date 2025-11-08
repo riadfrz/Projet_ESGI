@@ -1,7 +1,8 @@
 model ExerciseMuscle {
-    id         String @id @default(uuid())
+    id         String  @id @default(uuid())
     exerciseId String
     muscleId   String
+    isPrimary  Boolean @default(true) // true = primary muscle, false = secondary muscle
 
     // Relations
     exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)

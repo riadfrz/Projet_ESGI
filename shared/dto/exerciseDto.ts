@@ -36,6 +36,8 @@ export const muscleInfoSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().nullable().optional(),
+    identifier: z.string(),
+    isPrimary: z.boolean(), // true = primary muscle, false = secondary muscle
 });
 
 export type MuscleInfoSchema = z.infer<typeof muscleInfoSchema>;

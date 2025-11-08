@@ -15,6 +15,12 @@ class MuscleRepository {
         });
     }
 
+    async findByIdentifier(identifier: string): Promise<Muscle | null> {
+        return prisma.muscle.findUnique({
+            where: { identifier },
+        });
+    }
+
     async delete(id: string): Promise<Muscle> {
         return prisma.muscle.delete({
             where: { id },

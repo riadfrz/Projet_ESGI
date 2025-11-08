@@ -41,7 +41,7 @@ class MuscleController {
             const muscle = await muscleRepository.create({
                 name: data.name,
                 description: data.description,
-                picture: data.picture,
+                identifier: data.identifier,
             });
 
             const muscleDto = muscleTransform.toMuscleDto(muscle);
@@ -119,7 +119,7 @@ class MuscleController {
             const muscle = await muscleRepository.update(id, {
                 name: data.name,
                 description: data.description,
-                picture: data.picture,
+                identifier: data.identifier,
             });
 
             const muscleDto = muscleTransform.toMuscleDto(muscle);

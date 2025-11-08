@@ -8,7 +8,7 @@ import { z } from 'zod';
 const baseMuscleFieldsSchema = z.object({
     name: z.string().min(2, "Le nom du muscle doit contenir au moins 2 caractères"),
     description: z.string().optional(),
-    picture: z.string().optional(),
+    identifier: z.string().min(2, "L'identifiant du muscle doit contenir au moins 2 caractères"),
 });
 
 // ============================================================================
@@ -19,7 +19,7 @@ export const muscleSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().nullable().optional(),
-    picture: z.string().nullable().optional(),
+    identifier: z.string(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });

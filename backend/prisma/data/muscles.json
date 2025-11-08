@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Abdominals",
+    "identifier": "abdominals",
+    "description": "Core muscles including rectus abdominis, transverse abdominis, and obliques"
+  },
+  {
+    "name": "Abductors",
+    "identifier": "abductors",
+    "description": "Hip abductor muscles that move the leg away from the body"
+  },
+  {
+    "name": "Adductors",
+    "identifier": "adductors",
+    "description": "Inner thigh muscles that move the leg toward the body"
+  },
+  {
+    "name": "Biceps",
+    "identifier": "biceps",
+    "description": "Front upper arm muscles responsible for elbow flexion"
+  },
+  {
+    "name": "Calves",
+    "identifier": "calves",
+    "description": "Lower leg muscles including gastrocnemius and soleus"
+  },
+  {
+    "name": "Chest",
+    "identifier": "chest",
+    "description": "Pectoral muscles of the upper chest"
+  },
+  {
+    "name": "Forearms",
+    "identifier": "forearms",
+    "description": "Lower arm muscles used for grip and wrist movement"
+  },
+  {
+    "name": "Glutes",
+    "identifier": "glutes",
+    "description": "Gluteal muscles of the buttocks"
+  },
+  {
+    "name": "Hamstrings",
+    "identifier": "hamstrings",
+    "description": "Back thigh muscles responsible for knee flexion and hip extension"
+  },
+  {
+    "name": "Lats",
+    "identifier": "lats",
+    "description": "Latissimus dorsi, the broad back muscles"
+  },
+  {
+    "name": "Lower Back",
+    "identifier": "lower back",
+    "description": "Erector spinae and lower back muscles"
+  },
+  {
+    "name": "Middle Back",
+    "identifier": "middle back",
+    "description": "Rhomboids and mid-back muscles"
+  },
+  {
+    "name": "Quadriceps",
+    "identifier": "quadriceps",
+    "description": "Front thigh muscles responsible for knee extension"
+  },
+  {
+    "name": "Shoulders",
+    "identifier": "shoulders",
+    "description": "Deltoid muscles of the shoulder"
+  },
+  {
+    "name": "Triceps",
+    "identifier": "triceps",
+    "description": "Back upper arm muscles responsible for elbow extension"
+  },
+  {
+    "name": "Traps",
+    "identifier": "traps",
+    "description": "Trapezius muscles of the upper back and neck"
+  }
+]
