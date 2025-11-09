@@ -603,6 +603,648 @@
           }
         }
       ]
+    },
+    {
+      "name": "Challenges",
+      "item": [
+        {
+          "name": "Create Challenge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"30 Days Fitness Challenge\",\n  \"description\": \"Complete 30 workout sessions in 30 days\",\n  \"type\": \"DURATION\",\n  \"privacy\": \"PUBLIC\",\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-01-31T23:59:59Z\",\n  \"targetValue\": 30,\n  \"targetUnit\": \"SESSIONS\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/challenges",
+              "host": ["{{base_url}}"],
+              "path": ["challenges"]
+            },
+            "description": "Create a new challenge (Authenticated)"
+          }
+        },
+        {
+          "name": "Get All Challenges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges",
+              "host": ["{{base_url}}"],
+              "path": ["challenges"]
+            },
+            "description": "Get all challenges with filters (Public)"
+          }
+        },
+        {
+          "name": "Get My Created Challenges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/my",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", "my"]
+            },
+            "description": "Get challenges created by me (Authenticated)"
+          }
+        },
+        {
+          "name": "Get Challenge by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Get challenge details by ID (Public)"
+          }
+        },
+        {
+          "name": "Update Challenge",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Challenge Title\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/challenges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Update challenge (Creator only)"
+          }
+        },
+        {
+          "name": "Delete Challenge",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Delete challenge (Creator only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Challenge Participants",
+      "item": [
+        {
+          "name": "Join Challenge",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/join",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "join"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Join a challenge (Authenticated)"
+          }
+        },
+        {
+          "name": "Invite Users to Challenge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userIds\": [\"user-id-1\", \"user-id-2\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/invite",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "invite"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Invite users to a challenge (Creator only)"
+          }
+        },
+        {
+          "name": "Get Challenge Participants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/participants",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "participants"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Get all participants of a challenge (Public)"
+          }
+        },
+        {
+          "name": "Update Participant Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/participants/:userId",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "participants", ":userId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                },
+                {
+                  "key": "userId",
+                  "value": "",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Update participant status (Creator or participant) - status: ACCEPTED, DECLINED"
+          }
+        },
+        {
+          "name": "Leave Challenge",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/leave",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "leave"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Leave a challenge (Authenticated, not creator)"
+          }
+        },
+        {
+          "name": "Get My Participating Challenges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/participating",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", "participating"]
+            },
+            "description": "Get challenges I'm participating in (Authenticated)"
+          }
+        },
+        {
+          "name": "Get Challenge Progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/challenges/:id/progress",
+              "host": ["{{base_url}}"],
+              "path": ["challenges", ":id", "progress"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Challenge ID"
+                }
+              ]
+            },
+            "description": "Get my progress in a challenge (Authenticated)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Training Sessions",
+      "item": [
+        {
+          "name": "Create Training Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-01-15T10:00:00Z\",\n  \"duration\": 60,\n  \"caloriesBurned\": 350,\n  \"exercises\": [\n    {\n      \"exerciseId\": \"exercise-id-here\",\n      \"sets\": 3,\n      \"reps\": 10,\n      \"weight\": 50\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/training-sessions",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions"]
+            },
+            "description": "Record a training session (Authenticated)"
+          }
+        },
+        {
+          "name": "Get My Training Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/training-sessions",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions"]
+            },
+            "description": "Get my training sessions with filters (Authenticated)"
+          }
+        },
+        {
+          "name": "Get My Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/training-sessions/stats",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions", "stats"]
+            },
+            "description": "Get my training statistics (Authenticated)"
+          }
+        },
+        {
+          "name": "Get Training Session by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/training-sessions/:id",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Training Session ID"
+                }
+              ]
+            },
+            "description": "Get training session details (Authenticated, owner only)"
+          }
+        },
+        {
+          "name": "Update Training Session",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duration\": 75,\n  \"caloriesBurned\": 400\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/training-sessions/:id",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Training Session ID"
+                }
+              ]
+            },
+            "description": "Update training session (Authenticated, owner only)"
+          }
+        },
+        {
+          "name": "Delete Training Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/training-sessions/:id",
+              "host": ["{{base_url}}"],
+              "path": ["training-sessions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Training Session ID"
+                }
+              ]
+            },
+            "description": "Delete training session (Authenticated, owner only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Badges",
+      "item": [
+        {
+          "name": "Create Badge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Marathon Runner\",\n  \"description\": \"Complete 100 training sessions\",\n  \"icon\": \"🏃\",\n  \"criteria\": {\n    \"type\": \"SESSIONS_COUNT\",\n    \"value\": 100\n  },\n  \"points\": 500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/badges",
+              "host": ["{{base_url}}"],
+              "path": ["badges"]
+            },
+            "description": "Create a new badge (ADMIN only)"
+          }
+        },
+        {
+          "name": "Get All Badges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/badges",
+              "host": ["{{base_url}}"],
+              "path": ["badges"]
+            },
+            "description": "Get all badges (Public)"
+          }
+        },
+        {
+          "name": "Check Badges for All Users",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/badges/check",
+              "host": ["{{base_url}}"],
+              "path": ["badges", "check"]
+            },
+            "description": "Check and award badges to all eligible users (ADMIN/Cron)"
+          }
+        },
+        {
+          "name": "Get Badge by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/badges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["badges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Badge ID"
+                }
+              ]
+            },
+            "description": "Get badge details (Public)"
+          }
+        },
+        {
+          "name": "Update Badge",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Marathon Runner Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/badges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["badges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Badge ID"
+                }
+              ]
+            },
+            "description": "Update badge (ADMIN only)"
+          }
+        },
+        {
+          "name": "Delete Badge",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/badges/:id",
+              "host": ["{{base_url}}"],
+              "path": ["badges", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Badge ID"
+                }
+              ]
+            },
+            "description": "Delete badge (ADMIN only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Badges & Stats",
+      "item": [
+        {
+          "name": "Get My Badges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/badges",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "badges"]
+            },
+            "description": "Get my earned badges (Authenticated)"
+          }
+        },
+        {
+          "name": "Get User Badges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/:id/badges",
+              "host": ["{{base_url}}"],
+              "path": ["users", ":id", "badges"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get badges earned by a user (Public)"
+          }
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/:id/stats",
+              "host": ["{{base_url}}"],
+              "path": ["users", ":id", "stats"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user statistics (Public)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "item": [
+        {
+          "name": "Global Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leaderboard",
+              "host": ["{{base_url}}"],
+              "path": ["leaderboard"]
+            },
+            "description": "Get global leaderboard by badge points (Public)"
+          }
+        },
+        {
+          "name": "Challenge Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leaderboard/challenges",
+              "host": ["{{base_url}}"],
+              "path": ["leaderboard", "challenges"]
+            },
+            "description": "Get leaderboard by completed challenges (Public)"
+          }
+        },
+        {
+          "name": "Calorie Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leaderboard/calories",
+              "host": ["{{base_url}}"],
+              "path": ["leaderboard", "calories"]
+            },
+            "description": "Get leaderboard by calories burned (Public)"
+          }
+        },
+        {
+          "name": "Monthly Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leaderboard/monthly",
+              "host": ["{{base_url}}"],
+              "path": ["leaderboard", "monthly"]
+            },
+            "description": "Get monthly leaderboard by training sessions (Public)"
+          }
+        }
+      ]
     }
   ],
   "variable": [
