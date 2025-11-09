@@ -8,3 +8,4 @@ export * from './equipmentDto';
 export * from './exerciseDto';
 export * from './muscleDto';
 export * from './challengeDto';
+export * from './trainingSessionDto';

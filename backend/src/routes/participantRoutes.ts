@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { participantController } from "@/features/challenge";
+import { trainingSessionController } from "@/features/trainingSession";
 import { createSwaggerSchema } from "@/utils/swaggerUtils";
 import { isAuthenticated } from "@/middleware/authenticate";
 
@@ -113,5 +114,23 @@ export default async function participantRoutes(app: FastifyInstance) {
             ['Challenge Participants']
         ),
         handler: participantController.getParticipatingChallenges,
+    });
+
+    // Get challenge progress (Authenticated)
+    app.get('/:id/progress', {
+        preHandler: [isAuthenticated],
+        schema: createSwaggerSchema(
+            "Récupérer ma progression dans un défi",
+            [
+                { message: 'Progression récupérée', data: {}, status: 200 },
+                { message: 'Non authentifié', data: {}, status: 401 },
+                { message: 'Défi introuvable', data: {}, status: 404 },
+            ],
+            null,
+            true,
+            null,
+            ['Challenge Participants']
+        ),
+        handler: trainingSessionController.getChallengeProgress,
     });
 }
