@@ -7,6 +7,7 @@ import { registerRoutes } from './routes/registerRoutes';
 import { initSwagger } from './utils/swaggerUtils';
 import cookie from '@fastify/cookie';
 import googleOAuthPlugin from './plugins/google-oauth';
+import startCronJobs from './commands';
 
 
 // Chargement des variables d'environnement
@@ -59,10 +60,17 @@ const startServer = async () => {
 
   try {
     // Utiliser 'localhost' plutôt que '0.0.0.0' pour le débogage
+
+ 
+        
     await app.listen({ port, host: 'localhost' });
     console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
     console.log(`💻 Environnement: ${env || 'development'}`);
-
+    // Lancer les cron jobs uniquement si on n'est pas en environnement de test
+    if (env !== 'test') {
+      startCronJobs();
+      console.log('⏱️ Cron jobs lancés');
+    }
 
   } catch (err) {
     console.error('Erreur lors du démarrage du serveur:', err);

@@ -1,0 +1,9 @@
+[
+    {
+        "name": "console",
+        "description": "Console command",
+        "file": "./consoleCommand.ts",
+        "cronExpression": "*/60 * * * * *",
+        "isEnabled": true
+    }
+]
