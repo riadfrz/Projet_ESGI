@@ -5,6 +5,8 @@ import gymRoutes from "./gymRoutes";
 import equipmentRoutes from "./equipmentRoutes";
 import exerciseRoutes from "./exerciseRoutes";
 import muscleRoutes from "./muscleRoutes";
+import challengeRoutes from "./challengeRoutes";
+import participantRoutes from "./participantRoutes";
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
     // Register other route files here
@@ -13,4 +15,6 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     app.register(equipmentRoutes, { prefix: '/api/equipments' });
     app.register(exerciseRoutes, { prefix: '/api/exercises' });
     app.register(muscleRoutes, { prefix: '/api/muscles' });
+    app.register(challengeRoutes, { prefix: '/api/challenges' });
+    app.register(participantRoutes, { prefix: '/api/challenges' });
 }
