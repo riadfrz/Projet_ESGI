@@ -10,3 +10,4 @@ export * from './exerciseDto';
 export * from './muscleDto';
 export * from './challengeDto';
 export * from './trainingSessionDto';
+export * from './leaderboardDto';
