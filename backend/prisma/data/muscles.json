@@ -2,17 +2,7 @@
   {
     "name": "Abdominals",
     "identifier": "abdominals",
-    "description": "Core muscles including rectus abdominis, transverse abdominis, and obliques"
-  },
-  {
-    "name": "Abductors",
-    "identifier": "abductors",
-    "description": "Hip abductor muscles that move the leg away from the body"
-  },
-  {
-    "name": "Adductors",
-    "identifier": "adductors",
-    "description": "Inner thigh muscles that move the leg toward the body"
+    "description": "Core muscles including rectus abdominis, transverse abdominis"
   },
   {
     "name": "Biceps",
@@ -35,6 +25,11 @@
     "description": "Lower arm muscles used for grip and wrist movement"
   },
   {
+    "name": "Front Shoulders",
+    "identifier": "front-shoulders",
+    "description": "Anterior deltoid muscles of the shoulder"
+  },
+  {
     "name": "Glutes",
     "identifier": "glutes",
     "description": "Gluteal muscles of the buttocks"
@@ -45,38 +40,48 @@
     "description": "Back thigh muscles responsible for knee flexion and hip extension"
   },
   {
+    "name": "Hands",
+    "identifier": "hands",
+    "description": "Hand muscles and grip muscles"
+  },
+  {
     "name": "Lats",
     "identifier": "lats",
     "description": "Latissimus dorsi, the broad back muscles"
   },
   {
     "name": "Lower Back",
-    "identifier": "lower back",
+    "identifier": "lowerback",
     "description": "Erector spinae and lower back muscles"
   },
   {
-    "name": "Middle Back",
-    "identifier": "middle back",
-    "description": "Rhomboids and mid-back muscles"
+    "name": "Obliques",
+    "identifier": "obliques",
+    "description": "Side abdominal muscles"
   },
   {
     "name": "Quadriceps",
-    "identifier": "quadriceps",
+    "identifier": "quads",
     "description": "Front thigh muscles responsible for knee extension"
   },
   {
-    "name": "Shoulders",
-    "identifier": "shoulders",
-    "description": "Deltoid muscles of the shoulder"
+    "name": "Rear Shoulders",
+    "identifier": "rear-shoulders",
+    "description": "Posterior deltoid muscles of the shoulder"
+  },
+  {
+    "name": "Traps",
+    "identifier": "traps",
+    "description": "Upper trapezius muscles of the upper back and neck"
+  },
+  {
+    "name": "Traps Middle",
+    "identifier": "traps-middle",
+    "description": "Middle trapezius muscles"
   },
   {
     "name": "Triceps",
     "identifier": "triceps",
     "description": "Back upper arm muscles responsible for elbow extension"
-  },
-  {
-    "name": "Traps",
-    "identifier": "traps",
-    "description": "Trapezius muscles of the upper back and neck"
   }
 ]

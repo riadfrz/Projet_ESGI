@@ -2,7 +2,8 @@ import prisma from '../src/config/prisma';
 import {
   cleanDatabase,
   seedUsers,
-  seedMuscles
+  seedMuscles,
+  seedExercises
 } from '../src/helpers';
 
 async function main() {
@@ -12,6 +13,7 @@ async function main() {
     console.log('🌱 Starting seeding process...');
     await seedMuscles();
     await seedUsers();
+    await seedExercises();
 
     console.log('✅ Seeding completed successfully!');
   } catch (error) {

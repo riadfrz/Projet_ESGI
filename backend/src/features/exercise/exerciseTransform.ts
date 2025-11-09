@@ -6,10 +6,12 @@ import { Difficulty } from '@shared/enums';
 // Type for Exercise with muscles relation
 export type ExerciseWithMuscles = Exercise & {
     exerciseMuscles?: Array<{
+        isPrimary: boolean;
         muscle: {
             id: string;
             name: string;
             description: string | null;
+            identifier: string;
         };
     }>;
 };
@@ -43,6 +45,8 @@ class ExerciseTransform {
             id: em.muscle.id,
             name: em.muscle.name,
             description: em.muscle.description,
+            identifier: em.muscle.identifier,
+            isPrimary: em.isPrimary,
         }));
 
         return {

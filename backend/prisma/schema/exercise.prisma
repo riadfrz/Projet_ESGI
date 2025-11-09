@@ -9,7 +9,7 @@ enum Difficulty {
 model Exercise {
   id          String     @id @default(uuid())
   name        String
-  description String?
+  description String?    @db.Text
   difficulty  Difficulty @default(BEGINNER)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
