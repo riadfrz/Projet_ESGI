@@ -619,14 +619,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"30 Days Fitness Challenge\",\n  \"description\": \"Complete 30 workout sessions in 30 days\",\n  \"type\": \"DURATION\",\n  \"privacy\": \"PUBLIC\",\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-01-31T23:59:59Z\",\n  \"targetValue\": 30,\n  \"targetUnit\": \"SESSIONS\"\n}"
+              "raw": "{\n  \"title\": \"30 Days Fitness Challenge\",\n  \"description\": \"Complete 30 workout sessions in 30 days\",\n  \"duration\": 30,\n  \"difficulty\": \"MEDIUM\",\n  \"objectiveType\": \"DURATION\",\n  \"objectiveValue\": 30,\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-01-31T23:59:59Z\",\n  \"isPublic\": true,\n  \"maxParticipants\": 100\n}"
             },
             "url": {
               "raw": "{{base_url}}/challenges",
               "host": ["{{base_url}}"],
               "path": ["challenges"]
             },
-            "description": "Create a new challenge (Authenticated)"
+            "description": "Create a new challenge (Authenticated). Required: title, duration, objectiveType (DISTANCE/REPS/DURATION/WEIGHT), objectiveValue, startDate, endDate. Optional: description, difficulty (EASY/MEDIUM/HARD), isPublic, maxParticipants, gymId, exerciseIds"
           }
         },
         {
