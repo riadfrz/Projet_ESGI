@@ -3,7 +3,12 @@ import {
   cleanDatabase,
   seedUsers,
   seedMuscles,
-  seedExercises
+  seedExercises,
+  seedGyms,
+  seedEquipment,
+  seedTrainingSessions,
+  seedChallenges,
+  seedBadges,
 } from '../src/helpers';
 
 async function main() {
@@ -11,9 +16,22 @@ async function main() {
     await cleanDatabase();
 
     console.log('🌱 Starting seeding process...');
+
+    // Seed base data first
     await seedMuscles();
     await seedUsers();
     await seedExercises();
+
+    // Seed gym-related data
+    await seedGyms();
+    await seedEquipment();
+
+    // Seed user activity data
+    await seedTrainingSessions();
+    await seedChallenges();
+
+    // Seed badges and award them
+    await seedBadges();
 
     console.log('✅ Seeding completed successfully!');
   } catch (error) {

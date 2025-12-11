@@ -8,6 +8,9 @@ import muscleRoutes from "./muscleRoutes";
 import challengeRoutes from "./challengeRoutes";
 import participantRoutes from "./participantRoutes";
 import trainingSessionRoutes from "./trainingSessionRoutes";
+import badgeRoutes from "./badgeRoutes";
+import userBadgeRoutes from "./userBadgeRoutes";
+import leaderboardRoutes from "./leaderboardRoutes";
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
     // Register other route files here
@@ -19,4 +22,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     app.register(challengeRoutes, { prefix: '/api/challenges' });
     app.register(participantRoutes, { prefix: '/api/challenges' });
     app.register(trainingSessionRoutes, { prefix: '/api/training-sessions' });
+    app.register(badgeRoutes, { prefix: '/api/badges' });
+    app.register(userBadgeRoutes, { prefix: '/api/users' });
+    app.register(leaderboardRoutes, { prefix: '/api/leaderboard' });
 }

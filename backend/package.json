@@ -26,6 +26,7 @@
     "@prisma/client": "^6.1.0",
     "bcryptjs": "^3.0.2",
     "better-auth": "^1.3.34",
+    "cron": "^4.3.4",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.0",
     "fastify-plugin": "^5.1.0",
