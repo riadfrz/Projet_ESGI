@@ -32,3 +32,5 @@ Thumbs.db
 *.db
 *.db-journal
 backend/src/config/client/
+backend/.env
+backend/.env.test
