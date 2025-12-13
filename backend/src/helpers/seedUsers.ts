@@ -10,6 +10,7 @@ export async function seedUsers(
     const createdUsers: User[] = [];
 
     try {
+        // Create predefined users
         for (let i = 0; i < users.length; i++) {
             const { ...userData } = users[i];
             const user = await prisma.user.create({
@@ -20,6 +21,7 @@ export async function seedUsers(
             createdUsers.push(user);
         }
 
+        // Create faker users
         for (let i = 0; i < countFakerUsers; i++) {
             const fakerUserData = fakerUser();
             const { ...fakerUserDataWithoutAddress } = fakerUserData;

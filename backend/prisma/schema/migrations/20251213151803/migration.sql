@@ -1,20 +1,22 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `accounts` (
+    `id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `accountId` VARCHAR(191) NOT NULL,
+    `providerId` VARCHAR(191) NOT NULL,
+    `accessToken` TEXT NULL,
+    `refreshToken` TEXT NULL,
+    `idToken` TEXT NULL,
+    `accessTokenExpiresAt` DATETIME(3) NULL,
+    `refreshTokenExpiresAt` DATETIME(3) NULL,
+    `scope` VARCHAR(191) NULL,
+    `password` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
-  - You are about to drop the column `acceptNewsletter` on the `users` table. All the data in the column will be lost.
-  - You are about to drop the column `roles` on the `users` table. All the data in the column will be lost.
-  - The values [Mr,Mrs] on the enum `users_civility` will be removed. If these variants are still used in the database, this will fail.
-  - You are about to alter the column `birthDate` on the `users` table. The data in that column could be lost. The data in that column will be cast from `VarChar(191)` to `DateTime(3)`.
-
-*/
--- AlterTable
-ALTER TABLE `users` DROP COLUMN `acceptNewsletter`,
-    DROP COLUMN `roles`,
-    ADD COLUMN `deletedAt` DATETIME(3) NULL,
-    ADD COLUMN `points` INTEGER NOT NULL DEFAULT 0,
-    ADD COLUMN `role` ENUM('CLIENT', 'GYM_OWNER', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
-    MODIFY `civility` ENUM('MR', 'MRS', 'OTHER') NULL,
-    MODIFY `birthDate` DATETIME(3) NULL;
+    UNIQUE INDEX `accounts_providerId_accountId_key`(`providerId`, `accountId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `badges` (
@@ -82,7 +84,7 @@ CREATE TABLE `challenge_participants` (
 CREATE TABLE `exercises` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
+    `description` TEXT NULL,
     `difficulty` ENUM('BEGINNER', 'INTERMEDIATE', 'ADVANCED') NOT NULL DEFAULT 'BEGINNER',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -95,6 +97,7 @@ CREATE TABLE `exercise_muscles` (
     `id` VARCHAR(191) NOT NULL,
     `exerciseId` VARCHAR(191) NOT NULL,
     `muscleId` VARCHAR(191) NOT NULL,
+    `isPrimary` BOOLEAN NOT NULL DEFAULT true,
 
     UNIQUE INDEX `exercise_muscles_exerciseId_muscleId_key`(`exerciseId`, `muscleId`),
     PRIMARY KEY (`id`)
@@ -147,11 +150,28 @@ CREATE TABLE `muscles` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
-    `picture` VARCHAR(191) NULL,
+    `identifier` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `muscles_name_key`(`name`),
+    UNIQUE INDEX `muscles_identifier_key`(`identifier`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sessions` (
+    `id` VARCHAR(191) NOT NULL,
+    `expiresAt` DATETIME(3) NOT NULL,
+    `token` VARCHAR(2000) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `ipAddress` VARCHAR(191) NULL,
+    `userAgent` VARCHAR(191) NULL,
+    `authProvider` ENUM('GOOGLE', 'APPLE', 'MAGIC_LINK', 'EMAIL_PASSWORD') NOT NULL DEFAULT 'EMAIL_PASSWORD',
+    `userId` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `sessions_token_key`(`token`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -173,6 +193,26 @@ CREATE TABLE `training_sessions` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `users` (
+    `id` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NULL,
+    `civility` ENUM('MR', 'MRS', 'OTHER') NULL,
+    `birthDate` DATETIME(3) NULL,
+    `role` ENUM('CLIENT', 'GYM_OWNER', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
+    `points` INTEGER NOT NULL DEFAULT 0,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `deletedAt` DATETIME(3) NULL,
+
+    UNIQUE INDEX `users_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `user_badges` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -182,6 +222,22 @@ CREATE TABLE `user_badges` (
     UNIQUE INDEX `user_badges_userId_badgeId_key`(`userId`, `badgeId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `verifications` (
+    `id` VARCHAR(191) NOT NULL,
+    `identifier` VARCHAR(191) NOT NULL,
+    `value` VARCHAR(191) NOT NULL,
+    `expiresAt` DATETIME(3) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `verifications_identifier_value_key`(`identifier`, `value`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `accounts` ADD CONSTRAINT `accounts_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `challenges` ADD CONSTRAINT `challenges_createdBy_fkey` FOREIGN KEY (`createdBy`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -215,6 +271,9 @@ ALTER TABLE `gyms` ADD CONSTRAINT `gyms_ownerId_fkey` FOREIGN KEY (`ownerId`) RE
 
 -- AddForeignKey
 ALTER TABLE `gym_equipments` ADD CONSTRAINT `gym_equipments_gymId_fkey` FOREIGN KEY (`gymId`) REFERENCES `gyms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sessions` ADD CONSTRAINT `sessions_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `training_sessions` ADD CONSTRAINT `training_sessions_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

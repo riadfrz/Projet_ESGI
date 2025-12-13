@@ -1,10 +1,12 @@
 import { authRepository } from "@/features/auth";
+import { userRepository } from "@/features/user";
 import { authTransform } from "@/features/auth/authTransform";
 import { ApiResponse } from "@/types";
 import { asyncHandler } from "@/utils";
-import { jsonResponse } from "@/utils/jsonResponse";
+import { jsonResponse, authResponse } from "@/utils/jsonResponse";
 import { logger } from "@/utils/logger";
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import {
     CurrentUserResponseDto,
     GoogleProfileDto,
@@ -12,9 +14,14 @@ import {
     SessionResponseDto,
     UserDto,
     IdParams,
-    idSchema
+    idSchema,
+    RegisterDto,
+    LoginDto,
+    registerSchema,
+    loginSchema,
+    SuccessAuthResponseDto
 } from "@shared/dto";
-import { AuthProviderEnum } from "@shared/enums";
+import { AuthProviderEnum, CivilityEnum } from "@shared/enums";
 
 class AuthController {
     private logger = logger.child({
@@ -86,54 +93,53 @@ class AuthController {
     });
 
     /**
-     * Development login (only for testing in non-production environments)
-     * Allows creating a session with just an email and optional role
+     * Register a new user
      */
-    public devLogin = asyncHandler<unknown, unknown, unknown, { sessionToken: string }>({
+    public register = asyncHandler<RegisterDto, unknown, unknown, SuccessAuthResponseDto>({
+        bodySchema: registerSchema,
         logger: this.logger,
-        handler: async (request, reply): Promise<ApiResponse<{ sessionToken: string } | void> | void> => {
-            // Only allow in development
-            if (process.env.NODE_ENV === 'production') {
-                return jsonResponse(reply, 'Endpoint disabled in production', undefined, 403);
+        handler: async (request, reply): Promise<ApiResponse<SuccessAuthResponseDto | void> | void> => {
+            const existingUser = await userRepository.findByEmail(request.body.email);
+
+            if (existingUser) {
+                return jsonResponse(reply, 'Utilisateur déjà existant', undefined, 409);
             }
 
-            const { email, role, firstName, lastName } = request.body as {
-                email: string;
-                role?: string;
-                firstName?: string;
-                lastName?: string;
-            };
+            const hashedPassword = await bcrypt.hash(request.body.password, 10);
 
-            if (!email) {
-                return jsonResponse(reply, 'Email is required', undefined, 400);
-            }
+            // Extract data from request body, omitting confirmPassword and other non-user fields
+            const {
+                confirmPassword: _confirmPassword,
+                terms: _terms,
+                privacy: _privacy,
+                rememberMe: _rememberMe,
+                ...userData
+            } = request.body;
 
-            // Find or create user
-            let user = await authRepository.findUserByEmail(email);
+            const createdUser = await userRepository.create({
+                email: userData.email,
+                password: hashedPassword,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                phone: userData.phone || null,
+                civility: (userData.civility as any) || null,
+                birthDate: userData.birthDate
+                    ? typeof userData.birthDate === 'string'
+                        ? new Date(userData.birthDate)
+                        : userData.birthDate
+                    : null,
+            });
 
-            if (!user) {
-                // Create new user for testing
-                user = await authRepository.createDevUser({
-                    email,
-                    firstName: firstName || 'Test',
-                    lastName: lastName || 'User',
-                    role: role || 'CLIENT',
-                });
-            } else if (role) {
-                // Update role if provided
-                user = await authRepository.updateUserRole(user.id, role);
-            }
-
-            // Generate secure random session token
+            // Generate secure session token
             const sessionToken = crypto.randomBytes(32).toString('hex');
 
             // Create session in database
             await authRepository.createSession({
-                userId: user.id,
+                userId: createdUser.id,
                 token: sessionToken,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                 ipAddress: request.ip,
-                userAgent: request.headers['user-agent'] || 'Postman/Dev',
+                userAgent: request.headers['user-agent'] || 'Unknown',
                 authProvider: AuthProviderEnum.EMAIL_PASSWORD,
             });
 
@@ -146,12 +152,63 @@ class AuthController {
                 path: '/',
             });
 
-            return jsonResponse(
-                reply,
-                'Dev session created successfully',
-                { sessionToken }, // Return token so you can copy it to Postman
-                200
+            return authResponse(reply, sessionToken, sessionToken);
+        },
+    });
+
+    /**
+     * Login user
+     */
+    public login = asyncHandler<LoginDto, unknown, unknown, SuccessAuthResponseDto>({
+        bodySchema: loginSchema,
+        logger: this.logger,
+        handler: async (request, reply): Promise<ApiResponse<SuccessAuthResponseDto | void> | void> => {
+            const user = await userRepository.findByEmail(request.body.email);
+
+            if (!user) {
+                return jsonResponse(reply, 'Identifiants invalides', undefined, 401);
+            }
+
+            // Validate password
+            const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
+
+            if (!isPasswordValid) {
+                return jsonResponse(reply, 'Identifiants invalides', undefined, 401);
+            }
+
+            // Generate secure session token
+            const sessionToken = crypto.randomBytes(32).toString('hex');
+
+            // Create session in database
+            await authRepository.createSession({
+                userId: user.id,
+                token: sessionToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                ipAddress: request.ip,
+                userAgent: request.headers['user-agent'] || 'Unknown',
+                authProvider: AuthProviderEnum.EMAIL_PASSWORD,
+            });
+
+            // Set secure HTTP-only cookie
+            reply.setCookie('session', sessionToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+                path: '/',
+            });
+
+            this.logger.info(
+                {
+                    msg: 'Utilisateur connecté',
+                    action: 'login',
+                    status: 'success',
+                    timestamp: Date.now(),
+                },
+                'Utilisateur connecté'
             );
+
+            return authResponse(reply, sessionToken, sessionToken);
         },
     });
 

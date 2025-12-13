@@ -1,23 +1,48 @@
 import { FastifyInstance } from "fastify";
 import { authController } from "@/features/auth";
 import { createSwaggerSchema } from "@/utils/swaggerUtils";
+import { registerSchema, loginSchema } from "@shared/dto";
 
 export default async function authRoutes(app: FastifyInstance) {
-    // Development login (only enabled in non-production)
-    app.post('/dev-login', {
+    // Register new user
+    app.post('/register', {
         schema: createSwaggerSchema(
-            "Login pour testing (DEV ONLY)",
+            "Créer un nouvel utilisateur",
             [
-                { message: 'Dev session created successfully', data: {}, status: 200 },
-                { message: 'Email is required', data: {}, status: 400 },
-                { message: 'Endpoint disabled in production', data: {}, status: 403 },
+                { message: 'Utilisateur créé avec succès', data: {}, status: 200 },
+                { message: 'Utilisateur déjà existant', data: {}, status: 409 },
+                { message: "Erreur lors de la création de l'utilisateur", data: {}, status: 500 },
             ],
-            null,
+            (registerSchema as any)._def?.schema || registerSchema,
             false,
             null,
             ['Auth']
         ),
-        handler: authController.devLogin,
+        handler: authController.register,
+    });
+
+    // Login
+    app.post('/login', {
+        schema: createSwaggerSchema(
+            "Connexion à l'application",
+            [
+                {
+                    message: 'Connexion réussie',
+                    data: {
+                        accessToken: 'string',
+                        refreshToken: 'string',
+                    },
+                    status: 200,
+                },
+                { message: 'Identifiants invalides', data: {}, status: 401 },
+                { message: 'Erreur lors de la connexion', data: {}, status: 500 },
+            ],
+            loginSchema,
+            false,
+            null,
+            ['Auth']
+        ),
+        handler: authController.login,
     });
 
     // Logout

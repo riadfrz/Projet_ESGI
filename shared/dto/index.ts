@@ -1,3 +1,4 @@
+export * from './authDto';
 export * from './oauthDto';
 export * from './responseDto';
 export * from './sessionDto';

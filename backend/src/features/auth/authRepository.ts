@@ -1,4 +1,4 @@
-import { User, $Enums } from "@/config/client";
+import { User, Account, $Enums } from "@/config/client";
 import prisma from "@/config/prisma";
 import { 
     UpsertUserFromOAuthParamsDto, 
@@ -63,20 +63,31 @@ class AuthRepository {
     }
 
     /**
-     * Create a dev user (for testing purposes)
+     * Find account by userId and providerId
      */
-    async createDevUser(params: {
-        email: string;
-        firstName: string;
-        lastName: string;
-        role: string;
-    }): Promise<User> {
-        return prisma.user.create({
+    async findAccountByUserId(userId: string, providerId: string): Promise<Account | null> {
+        return prisma.account.findFirst({
+            where: { 
+                userId,
+                providerId 
+            }
+        });
+    }
+
+    /**
+     * Create an account with password for credentials auth
+     */
+    async createCredentialsAccount(params: {
+        userId: string;
+        password: string;
+    }): Promise<Account> {
+        const accountId = `credentials_${params.userId}`;
+        return prisma.account.create({
             data: {
-                email: params.email,
-                firstName: params.firstName,
-                lastName: params.lastName,
-                role: params.role as $Enums.Role,
+                userId: params.userId,
+                accountId,
+                providerId: 'credentials',
+                password: params.password,
             }
         });
     }
