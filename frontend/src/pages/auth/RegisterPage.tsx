@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { useAuthStore } from '@/stores/authStore';
-
-type UserRole = 'CLIENT' | 'OWNER' | 'ADMIN';
+import { authService } from '@/api/authServices';
+import { UserRole } from '@/types';
 
 const RegisterPage = () => {
   const [role, setRole] = useState<UserRole>('CLIENT');
@@ -22,7 +21,6 @@ const RegisterPage = () => {
   
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { setIsAuthenticated, setUser } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,22 +39,27 @@ const RegisterPage = () => {
 
     try {
       console.log('Registering as', role, formData);
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Auto-login after registration
-      setUser({
-          id: 'new-user',
+      const response = await authService.register({
           email: formData.email,
-          role: role,
+          password: formData.password,
           firstName: formData.firstName,
-          lastName: formData.lastName
-      } as any);
-      setIsAuthenticated(true);
-      
-      navigate('/dashboard');
+          lastName: formData.lastName,
+          role: role,
+          // Add other fields as needed based on DTO
+          gymName: formData.gymName,
+          address: formData.address,
+          secretCode: formData.secretCode
+      });
+
+      if (response && (response.status === 200 || response.status === 201)) {
+          navigate('/login');
+      } else {
+          throw new Error('Registration failed');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Registration error:', error);
+      alert('Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -76,9 +79,8 @@ const RegisterPage = () => {
           <h2 className="text-xl text-gray-400">Create an Account</h2>
         </div>
 
-        {/* Role Selection */}
         <div className="flex p-1 bg-dark-bg rounded-xl mb-8 border border-white/5">
-          {(['CLIENT', 'OWNER', 'ADMIN'] as UserRole[]).map((r) => (
+          {(['CLIENT', 'GYM_OWNER', 'ADMIN'] as UserRole[]).map((r) => (
             <button
               key={r}
               type="button"
@@ -89,7 +91,7 @@ const RegisterPage = () => {
                   : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              {r === 'CLIENT' ? 'Client' : r === 'OWNER' ? 'Gym Owner' : 'Super Admin'}
+              {r === 'CLIENT' ? 'Client' : r === 'GYM_OWNER' ? 'Gym Owner' : 'Super Admin'}
             </button>
           ))}
         </div>
@@ -141,7 +143,7 @@ const RegisterPage = () => {
           </div>
 
           {/* Role specific fields */}
-          {role === 'OWNER' && (
+          {role === 'GYM_OWNER' && (
             <div className="space-y-6 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-300">
               <h3 className="text-lg font-medium text-neon-purple">Gym Details</h3>
               <Input
@@ -181,9 +183,9 @@ const RegisterPage = () => {
             size="lg" 
             isLoading={loading}
             className="mt-8"
-            variant={role === 'CLIENT' ? 'primary' : role === 'OWNER' ? 'secondary' : 'ghost'} // Just utilizing variants for fun, typically keep primary
+            variant={role === 'CLIENT' ? 'primary' : role === 'GYM_OWNER' ? 'secondary' : 'ghost'} // Just utilizing variants for fun, typically keep primary
           >
-             {role === 'CLIENT' ? 'Join Challenge' : role === 'OWNER' ? 'Register Gym' : 'Access Admin'}
+             {role === 'CLIENT' ? 'Join Challenge' : role === 'GYM_OWNER' ? 'Register Gym' : 'Access Admin'}
           </Button>
         </form>
 

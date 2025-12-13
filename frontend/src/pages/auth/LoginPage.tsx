@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 
+import { authService } from '@/api/authServices';
 import { useAuthStore } from '@/stores/authStore';
 
 const LoginPage = () => {
@@ -12,7 +13,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setIsAuthenticated, setUser } = useAuthStore();
+  const { checkAuth } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,27 +21,19 @@ const LoginPage = () => {
     setError('');
 
     try {
-      // TODO: Use actual login method when available. Using devLogin for now or just redirecting.
-      // await authService.login(email, password);
-      // For demo purposes, allow any login
-      console.log('Logging in with:', email, password);
+      const response = await authService.login({ email, password });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set mock user and auth state
-      setUser({
-          id: '1',
-          email: email,
-          role: 'CLIENT', // Default to client for now
-          firstName: 'John',
-          lastName: 'Doe'
-      } as any);
-      setIsAuthenticated(true);
-
-      // Navigate to dashboard
-      navigate('/dashboard');
-    } catch {
+      // Force status update (although checkAuth might be enough, usually login returns user or token)
+      // If login returns tokens, we might need to fetch user separately or authService handles it.
+      // Assuming login sets cookies, we just need to fetch user state.
+      if (response && response.status === 200) {
+        await checkAuth(); // Updates store state
+        navigate('/dashboard');
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       setError('Invalid email or password');
     } finally {
       setLoading(false);
