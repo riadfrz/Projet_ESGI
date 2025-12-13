@@ -51,11 +51,11 @@ const AppRoutes = () => {
 
                     {/* Private Routes */}
                     <Route element={<PrivateRoutes />}>
-                        <Route path="/dashboard" element={<DashboardLayout />}>
-                            <Route index element={<DashboardRedirect />} />
-                            <Route path="client/*" element={<ClientDashboard />} />
-                            <Route path="owner/*" element={<OwnerDashboard />} />
-                            <Route path="admin/*" element={<AdminDashboard />} />
+                        <Route path="/dashboard/*" element={<DashboardLayout />}>
+                             <Route index element={<DashboardRedirect />} />
+                             <Route path="client/*" element={<ClientDashboard />} />
+                             <Route path="owner/*" element={<OwnerDashboard />} />
+                             <Route path="admin/*" element={<AdminDashboard />} />
                         </Route>
                     </Route>
 

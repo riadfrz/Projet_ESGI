@@ -4,8 +4,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 
-import { authService } from '@/api/authServices';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +12,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { checkAuth } = useAuthStore();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,13 +20,9 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const response = await authService.login({ email, password });
+      const response = await login({ email, password });
       
-      // Force status update (although checkAuth might be enough, usually login returns user or token)
-      // If login returns tokens, we might need to fetch user separately or authService handles it.
-      // Assuming login sets cookies, we just need to fetch user state.
       if (response && response.status === 200) {
-        await checkAuth(); // Updates store state
         navigate('/dashboard');
       } else {
         throw new Error('Login failed');

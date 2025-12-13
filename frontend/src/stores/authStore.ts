@@ -1,7 +1,6 @@
 import { UserDto } from '@/types';
 import { create } from 'zustand';
 import { authService } from '@/api/authServices';
-import { parseJwt } from '@/utils/jwt';
 import Cookies from 'js-cookie';
 
 interface AuthState {
@@ -33,38 +32,23 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ isLoading: true });
         try {
             const token = Cookies.get('accessToken');
-            if (token) {
-                const decoded = parseJwt(token);
-                if (decoded) {
-                    // Map JWT payload to UserDto
-                    // JWT often uses 'sub' for id, but backend implementation puts 'id' directly.
-                    // We need to handle potential expiration check here if not handled by interceptor logic
-                    if (decoded.exp * 1000 < Date.now()) {
-                        throw new Error('Token expired');
-                    }
-                    
-                    const user: UserDto = {
-                        id: decoded.id,
-                        email: decoded.email,
-                        firstName: decoded.firstName,
-                        lastName: decoded.lastName,
-                        role: decoded.role,
-                        points: 0, // Not in JWT, default to 0 or fetch separately if possible
-                        createdAt: '', // Missing in JWT
-                        updatedAt: ''  // Missing in JWT
-                    };
-                    set({ user, isAuthenticated: true });
-                } else {
-                    set({ user: null, isAuthenticated: false });
-                }
-            } else {
-                // Should we try /me as fallback? 
-                // Given the issue, let's rely on token for now.
+            if (!token) {
                 set({ user: null, isAuthenticated: false });
+                set({ isLoading: false });
+                return;
+            }
+
+            const response = await authService.getCurrentUser();
+            if (response && response.data) {
+                set({ user: response.data, isAuthenticated: true });
+            } else {
+                // If token exists but /me fails, maybe token is invalid
+                set({ user: null, isAuthenticated: false });
+                Cookies.remove('accessToken');
             }
         } catch (error) {
             console.warn('Auth check failed', error);
-            Cookies.remove('accessToken'); // Cleanup bad token
+            Cookies.remove('accessToken');
             set({ user: null, isAuthenticated: false });
         } finally {
             set({ isLoading: false });

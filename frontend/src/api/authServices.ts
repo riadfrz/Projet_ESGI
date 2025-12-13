@@ -12,6 +12,10 @@ class AuthService {
         
         // Backend returns raw { accessToken, refreshToken } on success for register too
         if (response && response.accessToken) {
+             Cookies.set('accessToken', response.accessToken);
+             if (response.refreshToken) {
+                 Cookies.set('refreshToken', response.refreshToken);
+             }
              return {
                  status: 200, // or 201
                  message: 'Registration successful',
@@ -31,6 +35,9 @@ class AuthService {
         // Backend returns raw { accessToken, refreshToken } but we expect ApiResponse
         if (response && response.accessToken) {
             Cookies.set('accessToken', response.accessToken);
+            if (response.refreshToken) {
+                Cookies.set('refreshToken', response.refreshToken);
+            }
             return {
                 status: 200,
                 message: 'Login successful',

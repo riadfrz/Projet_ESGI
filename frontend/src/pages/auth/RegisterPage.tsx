@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { authService } from '@/api/authServices';
+import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 
 const RegisterPage = () => {
@@ -21,6 +21,7 @@ const RegisterPage = () => {
   
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,7 +41,7 @@ const RegisterPage = () => {
     try {
       console.log('Registering as', role, formData);
       
-      const response = await authService.register({
+      const response = await register({
           email: formData.email,
           password: formData.password,
           firstName: formData.firstName,
@@ -53,7 +54,17 @@ const RegisterPage = () => {
       });
 
       if (response && (response.status === 200 || response.status === 201)) {
-          navigate('/login');
+          // If auto-login, redirect to dashboard. If not, login.
+          // authService.register logic in useAuth tries to update store if tokens present.
+          // If tokens are present, we should probably redirect to dashboard or login?
+          // The previous code redirected to /login.
+          // If we are logged in, we should redirect to dashboard.
+          // Let's check response.
+          if (response.data && response.data.accessToken) {
+              navigate('/dashboard');
+          } else {
+              navigate('/login');
+          }
       } else {
           throw new Error('Registration failed');
       }
