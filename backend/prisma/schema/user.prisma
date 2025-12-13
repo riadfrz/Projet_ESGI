@@ -34,9 +34,10 @@ model User {
   trainingSessions      TrainingSession[]
   userBadges            UserBadge[]
 
-  //Auth relation s
+  //Auth relations
   sessions Session[]
   accounts Account[]
+  tokens   Token[]
 
   @@map("users")
 }

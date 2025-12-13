@@ -1,4 +1,4 @@
-import { authRepository } from "@/features/auth";
+import { authRepository, authService } from "@/features/auth";
 import { userRepository } from "@/features/user";
 import { authTransform } from "@/features/auth/authTransform";
 import { ApiResponse } from "@/types";
@@ -130,29 +130,14 @@ class AuthController {
                     : null,
             });
 
-            // Generate secure session token
-            const sessionToken = crypto.randomBytes(32).toString('hex');
+            // Generate JWT tokens
+            const tokens = await authService.generateTokens(createdUser, request);
 
-            // Create session in database
-            await authRepository.createSession({
-                userId: createdUser.id,
-                token: sessionToken,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                ipAddress: request.ip,
-                userAgent: request.headers['user-agent'] || 'Unknown',
-                authProvider: AuthProviderEnum.EMAIL_PASSWORD,
-            });
+            if (!tokens?.accessToken?.token || !tokens?.refreshToken?.token) {
+                return jsonResponse(reply, 'Erreur lors de la génération des tokens', undefined, 500);
+            }
 
-            // Set secure HTTP-only cookie
-            reply.setCookie('session', sessionToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-                path: '/',
-            });
-
-            return authResponse(reply, sessionToken, sessionToken);
+            return authResponse(reply, tokens.accessToken.token, tokens.refreshToken.token);
         },
     });
 
@@ -176,27 +161,12 @@ class AuthController {
                 return jsonResponse(reply, 'Identifiants invalides', undefined, 401);
             }
 
-            // Generate secure session token
-            const sessionToken = crypto.randomBytes(32).toString('hex');
+            // Generate JWT tokens
+            const tokens = await authService.generateTokens(user, request);
 
-            // Create session in database
-            await authRepository.createSession({
-                userId: user.id,
-                token: sessionToken,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                ipAddress: request.ip,
-                userAgent: request.headers['user-agent'] || 'Unknown',
-                authProvider: AuthProviderEnum.EMAIL_PASSWORD,
-            });
-
-            // Set secure HTTP-only cookie
-            reply.setCookie('session', sessionToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-                path: '/',
-            });
+            if (!tokens?.accessToken?.token || !tokens?.refreshToken?.token) {
+                return jsonResponse(reply, 'Erreur lors de la génération des tokens', undefined, 500);
+            }
 
             this.logger.info(
                 {
@@ -208,7 +178,7 @@ class AuthController {
                 'Utilisateur connecté'
             );
 
-            return authResponse(reply, sessionToken, sessionToken);
+            return authResponse(reply, tokens.accessToken.token, tokens.refreshToken.token);
         },
     });
 
