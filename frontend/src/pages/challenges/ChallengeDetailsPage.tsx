@@ -54,8 +54,8 @@ const ChallengeDetailsPage = () => {
             await challengeService.joinChallenge(challenge.id);
             showToast('Joined challenge successfully!', 'success');
             fetchDetails();
-        } catch (error) {
-            showToast('Failed to join challenge', 'error');
+        } catch (error: any) {
+            showToast(error.message || 'Failed to join challenge', 'error');
         } finally {
             setJoining(false);
         }

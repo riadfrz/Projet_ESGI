@@ -26,9 +26,16 @@ const GymDetailsPage = () => {
 
                 if (gymRes.data) setGym(gymRes.data);
                 
-                if (Array.isArray(eqRes)) setEquipment(eqRes);
-                else if (eqRes && Array.isArray(eqRes.data)) setEquipment(eqRes.data);
-                else setEquipment([]);
+                // Safe handling for equipment response
+                if (eqRes.data && !Array.isArray(eqRes.data)) {
+                    setEquipment(eqRes.data.data); // Handle paginated response
+                } else if (Array.isArray(eqRes.data)) {
+                    setEquipment(eqRes.data); // Handle direct array
+                } else if (Array.isArray(eqRes)) {
+                    setEquipment(eqRes); // Handle direct array (legacy)
+                } else {
+                    setEquipment([]);
+                }
 
             } catch (error) {
                 console.error(error);

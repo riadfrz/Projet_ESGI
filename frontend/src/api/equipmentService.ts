@@ -4,11 +4,12 @@ import {
     EquipmentDto, 
     CreateEquipmentDto, 
     UpdateEquipmentDto, 
-    QueryEquipmentsDto 
+    QueryEquipmentsDto,
+    PaginatedResponse 
 } from '@shared/dto';
 
 class EquipmentService {
-    public async getAllEquipments(query?: QueryEquipmentsDto): Promise<ApiResponse<EquipmentDto[]>> {
+    public async getAllEquipments(query?: QueryEquipmentsDto): Promise<ApiResponse<PaginatedResponse<EquipmentDto>>> {
         const queryString = query ? '?' + new URLSearchParams(query as any).toString() : '';
         return api.fetchRequest(`/api/equipment${queryString}`, 'GET');
     }
