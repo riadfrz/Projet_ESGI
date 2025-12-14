@@ -22,4 +22,5 @@ export enum ChallengeType {
     REPS = 'REPS',
     DURATION = 'DURATION',
     WEIGHT = 'WEIGHT',
+    SESSIONS = 'SESSIONS',
 }

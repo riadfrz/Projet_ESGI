@@ -19,10 +19,8 @@ const ChallengeListPage = () => {
             ]);
             
             // Safe handling for all challenges
-            if (Array.isArray(allRes)) {
-                setChallenges(allRes);
-            } else if (allRes && Array.isArray(allRes.data)) {
-                setChallenges(allRes.data);
+            if (allRes.data && !Array.isArray(allRes.data)) {
+                setChallenges(allRes.data.data);
             } else {
                 setChallenges([]);
             }

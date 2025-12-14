@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { gymService } from '@/api/gymService';
 import { GymDto, QueryGymsDto } from '@shared/dto';
 import { GymCard } from '@/components/gyms/GymCard';
 import Input from '@/components/ui/Input';
 
 const GymListPage = () => {
+    const navigate = useNavigate();
     const [gyms, setGyms] = useState<GymDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -13,14 +15,8 @@ const GymListPage = () => {
         setLoading(true);
         try {
             const response = await gymService.getAllGyms(query);
-            // Handle both structure formats (direct array or nested data)
-            if (Array.isArray(response)) {
-                 setGyms(response);
-            } else if (response && Array.isArray(response.data)) {
-                setGyms(response.data);
-            } else if (response && response.data && Array.isArray(response.data.data)) {
-                 // Pagination structure sometimes has data.data
-                 setGyms(response.data.data);
+            if (response.data && !Array.isArray(response.data)) {
+                setGyms(response.data.data);
             } else {
                 setGyms([]);
             }
@@ -62,7 +58,11 @@ const GymListPage = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {gyms.map(gym => (
-                        <GymCard key={gym.id} gym={gym} />
+                        <GymCard 
+                            key={gym.id} 
+                            gym={gym} 
+                            onView={(id) => navigate(`/dashboard/client/gyms/${id}`)}
+                        />
                     ))}
                     {gyms.length === 0 && (
                         <div className="col-span-full text-center py-12 text-gray-500">

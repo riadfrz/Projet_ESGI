@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/authStore';
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuthStore(); 
+  const { isAuthenticated, logout, user } = useAuthStore(); 
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,20 +25,23 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center gap-4">
             {!isAuthenticated ? (
               <>
-                <a href="#features" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Features</a>
-                <a href="#how-it-works" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">How it Works</a>
-                <div className="flex items-center space-x-4 ml-4">
-                  <Button variant="ghost" size="sm" href="/login">Login</Button>
-                  <Button variant="primary" size="sm" href="/register">Get Started</Button>
-                </div>
+                <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Login</Link>
+                <Button href="/register" size="sm">Get Started</Button>
               </>
             ) : (
               <>
-                 <Link to="/dashboard" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Dashboard</Link>
-                 <Button variant="secondary" size="sm" onClick={handleLogout}>Logout</Button>
+                <Link to="/dashboard/profile" className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-r from-neon-blue to-neon-purple flex items-center justify-center text-xs font-bold text-white group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all">
+                    {(user?.firstName?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium hidden md:block">
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                </Link>
+                <Button variant="secondary" size="sm" onClick={handleLogout}>Logout</Button>
               </>
             )}
           </div>

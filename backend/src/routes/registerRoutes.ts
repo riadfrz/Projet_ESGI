@@ -11,12 +11,13 @@ import trainingSessionRoutes from "./trainingSessionRoutes";
 import badgeRoutes from "./badgeRoutes";
 import userBadgeRoutes from "./userBadgeRoutes";
 import leaderboardRoutes from "./leaderboardRoutes";
+import userRoutes from "./userRoutes";
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
     // Register other route files here
     app.register(authRoutes, { prefix: '/api/auth' });
     app.register(gymRoutes, { prefix: '/api/gyms' });
-    app.register(equipmentRoutes, { prefix: '/api/equipments' });
+    app.register(equipmentRoutes, { prefix: '/api/equipment' }); // Fixed pluralization
     app.register(exerciseRoutes, { prefix: '/api/exercises' });
     app.register(muscleRoutes, { prefix: '/api/muscles' });
     app.register(challengeRoutes, { prefix: '/api/challenges' });
@@ -25,4 +26,5 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     app.register(badgeRoutes, { prefix: '/api/badges' });
     app.register(userBadgeRoutes, { prefix: '/api/users' });
     app.register(leaderboardRoutes, { prefix: '/api/leaderboard' });
+    app.register(userRoutes, { prefix: '/api/users' }); // Register generic user routes
 }

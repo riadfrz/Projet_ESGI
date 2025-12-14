@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { ChallengeDto } from '@shared/dto';
 import { ChallengeDifficulty, ChallengeStatus } from '@shared/enums';
+import { useNavigate } from 'react-router-dom';
 
 interface ChallengeCardProps {
     challenge: ChallengeDto;
@@ -13,6 +14,12 @@ interface ChallengeCardProps {
 }
 
 export const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, onView, onJoin, isJoined }) => {
+    const navigate = useNavigate();
+    const handleView = () => {
+        if (onView) onView(challenge.id);
+        else navigate(`/dashboard/client/challenges/${challenge.id}`);
+    };
+
     const difficultyVariant = 
         challenge.difficulty === ChallengeDifficulty.EASY ? 'success' :
         challenge.difficulty === ChallengeDifficulty.MEDIUM ? 'warning' : 'danger';
@@ -48,7 +55,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, onView,
                         <Button 
                             variant="secondary" 
                             size="sm"
-                            onClick={() => onView && onView(challenge.id)}
+                            onClick={handleView}
                         >
                             Details
                         </Button>

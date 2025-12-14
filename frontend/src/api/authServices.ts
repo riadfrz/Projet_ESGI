@@ -73,6 +73,14 @@ class AuthService {
         }
     }
 
+    public async getSessions(): Promise<ApiResponse<any[]>> {
+        return api.fetchRequest('/api/auth/sessions', 'GET', null, true);
+    }
+
+    public async deleteSession(sessionId: string): Promise<ApiResponse<void>> {
+        return api.fetchRequest(`/api/auth/sessions/${sessionId}`, 'DELETE', null, true);
+    }
+
     /**
      * Initiate Google OAuth login
      */

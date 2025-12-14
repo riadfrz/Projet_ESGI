@@ -5,11 +5,12 @@ import {
     UpdateGymDto, 
     QueryGymsDto, 
     GymDto, 
-    UpdateGymStatusDto 
+    UpdateGymStatusDto,
+    PaginatedResponse 
 } from '@shared/dto';
 
 class GymService {
-    public async getAllGyms(query?: QueryGymsDto): Promise<ApiResponse<GymDto[]>> {
+    public async getAllGyms(query?: QueryGymsDto): Promise<ApiResponse<PaginatedResponse<GymDto>>> {
         const queryString = query ? '?' + new URLSearchParams(query as any).toString() : '';
         return api.fetchRequest(`/api/gyms${queryString}`, 'GET');
     }

@@ -9,6 +9,7 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 import ClientDashboard from '@/pages/dashboard/ClientDashboard';
 import OwnerDashboard from '@/pages/dashboard/OwnerDashboard';
 import AdminDashboard from '@/pages/dashboard/AdminDashboard';
+import UserProfilePage from '@/pages/profile/UserProfilePage';
 import { useAuthStore } from '@/stores/authStore';
 
 // Helper to redirect to correct role dashboard
@@ -54,8 +55,9 @@ const AppRoutes = () => {
                         <Route path="/dashboard/*" element={<DashboardLayout />}>
                              <Route index element={<DashboardRedirect />} />
                              <Route path="client/*" element={<ClientDashboard />} />
-                             <Route path="owner/*" element={<OwnerDashboard />} />
-                             <Route path="admin/*" element={<AdminDashboard />} />
+                            <Route path="owner/*" element={<OwnerDashboard />} />
+                            <Route path="admin/*" element={<AdminDashboard />} />
+                            <Route path="profile" element={<UserProfilePage />} />
                         </Route>
                     </Route>
 

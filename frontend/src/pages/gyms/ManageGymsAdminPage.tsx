@@ -13,11 +13,14 @@ const ManageGymsAdminPage = () => {
         setLoading(true);
         try {
             const response = await gymService.getAllGyms();
-            if (response.data) {
-                setGyms(response.data);
+            if (response.data && !Array.isArray(response.data)) {
+                setGyms(response.data.data);
+            } else {
+                setGyms([]);
             }
         } catch (error) {
             console.error(error);
+            setGyms([]);
         } finally {
             setLoading(false);
         }

@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { exerciseService } from '@/api/exerciseService';
-import { ExerciseDto, CreateExerciseDto } from '@shared/dto';
+import { muscleService } from '@/api/muscleService';
+import { ExerciseDto, CreateExerciseDto, MuscleDto } from '@shared/dto';
 import { Difficulty } from '@shared/enums';
 import { ExerciseCard } from '@/components/exercises/ExerciseCard';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import Badge from '@/components/ui/Badge';
 
 const ManageExercisesPage = () => {
     const [exercises, setExercises] = useState<ExerciseDto[]>([]);
+    const [muscles, setMuscles] = useState<MuscleDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
 
@@ -20,13 +23,22 @@ const ManageExercisesPage = () => {
         muscleIds: []
     });
 
-    const fetchExercises = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await exerciseService.getAllExercises();
-            if (response.data) {
-                setExercises(response.data);
-            }
+            const [exRes, musRes] = await Promise.all([
+                exerciseService.getAllExercises(),
+                muscleService.getAllMuscles()
+            ]);
+            
+            if (Array.isArray(exRes)) setExercises(exRes);
+            else if (exRes && Array.isArray(exRes.data)) setExercises(exRes.data);
+            else setExercises([]);
+
+            if (Array.isArray(musRes)) setMuscles(musRes);
+            else if (musRes && Array.isArray(musRes.data)) setMuscles(musRes.data);
+            else setMuscles([]);
+
         } catch (error) {
             console.error(error);
         } finally {
@@ -35,8 +47,19 @@ const ManageExercisesPage = () => {
     };
 
     useEffect(() => {
-        fetchExercises();
+        fetchData();
     }, []);
+
+    const toggleMuscle = (id: string) => {
+        setFormData(prev => {
+            const current = prev.muscleIds || [];
+            if (current.includes(id)) {
+                return { ...prev, muscleIds: current.filter(m => m !== id) };
+            } else {
+                return { ...prev, muscleIds: [...current, id] };
+            }
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,7 +72,7 @@ const ManageExercisesPage = () => {
                 difficulty: Difficulty.BEGINNER,
                 muscleIds: []
             });
-            fetchExercises();
+            fetchData();
         } catch (error) {
             alert('Failed to create exercise');
         }
@@ -59,7 +82,7 @@ const ManageExercisesPage = () => {
         if (!confirm('Are you sure?')) return;
         try {
             await exerciseService.deleteExercise(id);
-            fetchExercises();
+            fetchData();
         } catch (error) {
             alert('Failed to delete');
         }
@@ -101,6 +124,29 @@ const ManageExercisesPage = () => {
                                     <option key={t} value={t}>{t}</option>
                                 ))}
                             </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">Target Muscles</label>
+                            <div className="flex flex-wrap gap-2">
+                                {muscles.map(muscle => {
+                                    const isSelected = formData.muscleIds?.includes(muscle.id);
+                                    return (
+                                        <button
+                                            key={muscle.id}
+                                            type="button"
+                                            onClick={() => toggleMuscle(muscle.id)}
+                                            className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                                                isSelected 
+                                                    ? 'bg-neon-blue text-white shadow-lg shadow-neon-blue/20' 
+                                                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                            }`}
+                                        >
+                                            {muscle.name} {isSelected && '✓'}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div className="flex justify-end pt-4">
