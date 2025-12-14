@@ -17,6 +17,8 @@ const ManageExercisesPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingExercise, setEditingExercise] = useState<ExerciseDto | null>(null);
     const [viewingExercise, setViewingExercise] = useState<ExerciseWithMusclesDto | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | ''>('');
 
     // Form State
     const [formData, setFormData] = useState<Partial<CreateExerciseDto>>({
@@ -29,8 +31,12 @@ const ManageExercisesPage = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
+            const query: any = { limit: '1000' };
+            if (searchQuery) query.search = searchQuery;
+            if (difficultyFilter) query.difficulty = difficultyFilter;
+
             const [exRes, musRes] = await Promise.all([
-                exerciseService.getAllExercises(),
+                exerciseService.getAllExercises(query),
                 muscleService.getAllMuscles()
             ]);
             
@@ -54,8 +60,11 @@ const ManageExercisesPage = () => {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        const timeoutId = setTimeout(() => {
+            fetchData();
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, difficultyFilter]);
 
     const toggleMuscle = (id: string) => {
         setFormData(prev => {
@@ -133,12 +142,40 @@ const ManageExercisesPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-display font-bold">Manage Exercises</h1>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-display font-bold">Manage Exercises</h1>
+                    <p className="text-gray-400">Total exercises: {exercises.length}</p>
+                </div>
                 <Button onClick={() => showForm ? setShowForm(false) : resetForm()}>
                     {showForm ? 'Cancel' : 'Create Exercise'}
                 </Button>
             </div>
+
+            {/* Filters */}
+            <Card className="p-4">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                        <Input 
+                            placeholder="Search exercises..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <div className="w-full md:w-48">
+                        <select 
+                            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue outline-none transition-all h-[42px]"
+                            value={difficultyFilter}
+                            onChange={(e) => setDifficultyFilter(e.target.value as Difficulty)}
+                        >
+                            <option value="">All Difficulties</option>
+                            {Object.values(Difficulty).map(d => (
+                                <option key={d} value={d}>{d}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </Card>
 
             {showForm && (
                 <Card className="mb-8 animate-in fade-in slide-in-from-top-4">
