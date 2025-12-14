@@ -5,11 +5,12 @@ import {
     UpdateExerciseDto, 
     QueryExercisesDto, 
     ExerciseDto,
-    ExerciseWithMusclesDto
+    ExerciseWithMusclesDto,
+    PaginatedResponse
 } from '@shared/dto';
 
 class ExerciseService {
-    public async getAllExercises(query?: QueryExercisesDto): Promise<ApiResponse<ExerciseDto[]>> {
+    public async getAllExercises(query?: QueryExercisesDto): Promise<ApiResponse<PaginatedResponse<ExerciseWithMusclesDto>>> {
         const queryString = query ? '?' + new URLSearchParams(query as any).toString() : '';
         return api.fetchRequest(`/api/exercises${queryString}`, 'GET');
     }

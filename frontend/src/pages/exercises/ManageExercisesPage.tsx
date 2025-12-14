@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { exerciseService } from '@/api/exerciseService';
 import { muscleService } from '@/api/muscleService';
-import { ExerciseDto, CreateExerciseDto, MuscleDto } from '@shared/dto';
+import { ExerciseDto, CreateExerciseDto, MuscleDto, ExerciseWithMusclesDto, UpdateExerciseDto } from '@shared/dto';
 import { Difficulty } from '@shared/enums';
 import { ExerciseCard } from '@/components/exercises/ExerciseCard';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
 
 const ManageExercisesPage = () => {
@@ -14,6 +15,8 @@ const ManageExercisesPage = () => {
     const [muscles, setMuscles] = useState<MuscleDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [editingExercise, setEditingExercise] = useState<ExerciseDto | null>(null);
+    const [viewingExercise, setViewingExercise] = useState<ExerciseWithMusclesDto | null>(null);
 
     // Form State
     const [formData, setFormData] = useState<Partial<CreateExerciseDto>>({
@@ -31,13 +34,17 @@ const ManageExercisesPage = () => {
                 muscleService.getAllMuscles()
             ]);
             
-            if (Array.isArray(exRes)) setExercises(exRes);
-            else if (exRes && Array.isArray(exRes.data)) setExercises(exRes.data);
-            else setExercises([]);
+            if (exRes.data && !Array.isArray(exRes.data)) {
+                setExercises(exRes.data.data);
+            } else {
+                setExercises([]);
+            }
 
-            if (Array.isArray(musRes)) setMuscles(musRes);
-            else if (musRes && Array.isArray(musRes.data)) setMuscles(musRes.data);
-            else setMuscles([]);
+            if (musRes.data && !Array.isArray(musRes.data)) {
+                setMuscles(musRes.data.data);
+            } else {
+                setMuscles([]);
+            }
 
         } catch (error) {
             console.error(error);
@@ -61,11 +68,36 @@ const ManageExercisesPage = () => {
         });
     };
 
+    const handleEdit = (exercise: ExerciseDto) => {
+        setEditingExercise(exercise);
+        const exWithMuscles = exercise as ExerciseWithMusclesDto;
+        setFormData({
+            name: exercise.name,
+            description: exercise.description || '',
+            difficulty: exercise.difficulty,
+            muscleIds: exWithMuscles.muscles ? exWithMuscles.muscles.map(m => m.id) : []
+        });
+        setShowForm(true);
+    };
+
+    const handleView = (id: string) => {
+        const exercise = exercises.find(e => e.id === id);
+        if (exercise) {
+            setViewingExercise(exercise as ExerciseWithMusclesDto);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await exerciseService.createExercise(formData as CreateExerciseDto);
+            if (editingExercise) {
+                await exerciseService.updateExercise(editingExercise.id, formData as UpdateExerciseDto);
+            } else {
+                await exerciseService.createExercise(formData as CreateExerciseDto);
+            }
+            
             setShowForm(false);
+            setEditingExercise(null);
             setFormData({
                 name: '',
                 description: '',
@@ -74,7 +106,7 @@ const ManageExercisesPage = () => {
             });
             fetchData();
         } catch (error) {
-            alert('Failed to create exercise');
+            alert('Failed to save exercise');
         }
     };
 
@@ -88,18 +120,29 @@ const ManageExercisesPage = () => {
         }
     };
 
+    const resetForm = () => {
+        setEditingExercise(null);
+        setFormData({
+            name: '',
+            description: '',
+            difficulty: Difficulty.BEGINNER,
+            muscleIds: []
+        });
+        setShowForm(true);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-display font-bold">Manage Exercises</h1>
-                <Button onClick={() => setShowForm(!showForm)}>
+                <Button onClick={() => showForm ? setShowForm(false) : resetForm()}>
                     {showForm ? 'Cancel' : 'Create Exercise'}
                 </Button>
             </div>
 
             {showForm && (
                 <Card className="mb-8 animate-in fade-in slide-in-from-top-4">
-                    <h2 className="text-xl font-bold mb-4">Create New Exercise</h2>
+                    <h2 className="text-xl font-bold mb-4">{editingExercise ? 'Edit Exercise' : 'Create New Exercise'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input 
                             label="Name" 
@@ -150,7 +193,7 @@ const ManageExercisesPage = () => {
                         </div>
 
                         <div className="flex justify-end pt-4">
-                            <Button type="submit">Save Exercise</Button>
+                            <Button type="submit">{editingExercise ? 'Update Exercise' : 'Save Exercise'}</Button>
                         </div>
                     </form>
                 </Card>
@@ -165,6 +208,8 @@ const ManageExercisesPage = () => {
                             key={exercise.id} 
                             exercise={exercise} 
                             isAdmin
+                            onView={handleView}
+                            onEdit={() => handleEdit(exercise)}
                             onDelete={handleDelete}
                         />
                     ))}
@@ -173,6 +218,54 @@ const ManageExercisesPage = () => {
                             No exercises found.
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* View Modal */}
+            {viewingExercise && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-dark-card w-full max-w-lg rounded-xl border border-white/10 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-start">
+                            <div>
+                                <h3 className="text-2xl font-bold font-display">{viewingExercise.name}</h3>
+                                <Badge variant={
+                                    viewingExercise.difficulty === Difficulty.BEGINNER ? 'success' :
+                                    viewingExercise.difficulty === Difficulty.INTERMEDIATE ? 'warning' : 'danger'
+                                } className="mt-2">
+                                    {viewingExercise.difficulty}
+                                </Badge>
+                            </div>
+                            <button onClick={() => setViewingExercise(null)} className="text-gray-400 hover:text-white">
+                                <XMarkIcon className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Description</h4>
+                                <p className="text-gray-300 leading-relaxed">
+                                    {viewingExercise.description || 'No description provided.'}
+                                </p>
+                            </div>
+
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Target Muscles</h4>
+                                {viewingExercise.muscles && viewingExercise.muscles.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {viewingExercise.muscles.map(m => (
+                                            <span key={m.id} className="bg-white/5 text-neon-blue px-3 py-1 rounded-full text-sm border border-neon-blue/20">
+                                                {m.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 italic">No specific muscles targeted.</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="p-4 bg-white/5 flex justify-end">
+                            <Button onClick={() => setViewingExercise(null)}>Close</Button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

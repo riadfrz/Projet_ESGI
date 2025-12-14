@@ -4,11 +4,12 @@ import {
     MuscleDto, 
     CreateMuscleDto, 
     UpdateMuscleDto, 
-    QueryMusclesDto 
+    QueryMusclesDto,
+    PaginatedResponse
 } from '@shared/dto';
 
 class MuscleService {
-    public async getAllMuscles(query?: QueryMusclesDto): Promise<ApiResponse<MuscleDto[]>> {
+    public async getAllMuscles(query?: QueryMusclesDto): Promise<ApiResponse<PaginatedResponse<MuscleDto>>> {
         const queryString = query ? '?' + new URLSearchParams(query as any).toString() : '';
         return api.fetchRequest(`/api/muscles${queryString}`, 'GET');
     }

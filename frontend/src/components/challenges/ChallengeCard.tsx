@@ -3,7 +3,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { ChallengeDto } from '@shared/dto';
-import { ChallengeDifficulty, ChallengeStatus } from '@shared/enums';
+import { ChallengeDifficulty } from '@shared/enums';
 import { useNavigate } from 'react-router-dom';
 
 interface ChallengeCardProps {

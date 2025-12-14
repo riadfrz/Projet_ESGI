@@ -1,4 +1,5 @@
-export type UserRole = 'CLIENT' | 'GYM_OWNER' | 'ADMIN';
+import { UserRole } from '@shared/enums';
+export { UserRole };
 
 export interface UserDto {
     id: string;
@@ -7,8 +8,8 @@ export interface UserDto {
     lastName: string;
     role: UserRole;
     points: number;
-    phone?: string;
-    birthDate?: string;
+    phone?: string | null;
+    birthDate?: string | null;
     createdAt: string;
     updatedAt: string;
 }

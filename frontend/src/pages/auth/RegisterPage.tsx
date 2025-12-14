@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 
 const RegisterPage = () => {
-  const [role, setRole] = useState<UserRole>('CLIENT');
+  const [role, setRole] = useState<UserRole>(UserRole.CLIENT);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -91,7 +91,7 @@ const RegisterPage = () => {
         </div>
 
         <div className="flex p-1 bg-dark-bg rounded-xl mb-8 border border-white/5">
-          {(['CLIENT', 'GYM_OWNER', 'ADMIN'] as UserRole[]).map((r) => (
+          {([UserRole.CLIENT, UserRole.GYM_OWNER, UserRole.ADMIN] as UserRole[]).map((r) => (
             <button
               key={r}
               type="button"
@@ -102,7 +102,7 @@ const RegisterPage = () => {
                   : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              {r === 'CLIENT' ? 'Client' : r === 'GYM_OWNER' ? 'Gym Owner' : 'Super Admin'}
+              {r === UserRole.CLIENT ? 'Client' : r === UserRole.GYM_OWNER ? 'Gym Owner' : 'Super Admin'}
             </button>
           ))}
         </div>
@@ -154,7 +154,7 @@ const RegisterPage = () => {
           </div>
 
           {/* Role specific fields */}
-          {role === 'GYM_OWNER' && (
+          {role === UserRole.GYM_OWNER && (
             <div className="space-y-6 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-300">
               <h3 className="text-lg font-medium text-neon-purple">Gym Details</h3>
               <Input
@@ -174,7 +174,7 @@ const RegisterPage = () => {
             </div>
           )}
 
-          {role === 'ADMIN' && (
+          {role === UserRole.ADMIN && (
             <div className="space-y-6 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-300">
                <h3 className="text-lg font-medium text-neon-cyan">Admin Verification</h3>
                <Input
@@ -194,9 +194,9 @@ const RegisterPage = () => {
             size="lg" 
             isLoading={loading}
             className="mt-8"
-            variant={role === 'CLIENT' ? 'primary' : role === 'GYM_OWNER' ? 'secondary' : 'ghost'} // Just utilizing variants for fun, typically keep primary
+            variant={role === UserRole.CLIENT ? 'primary' : role === UserRole.GYM_OWNER ? 'secondary' : 'ghost'} // Just utilizing variants for fun, typically keep primary
           >
-             {role === 'CLIENT' ? 'Join Challenge' : role === 'GYM_OWNER' ? 'Register Gym' : 'Access Admin'}
+             {role === UserRole.CLIENT ? 'Join Challenge' : role === UserRole.GYM_OWNER ? 'Register Gym' : 'Access Admin'}
           </Button>
         </form>
 

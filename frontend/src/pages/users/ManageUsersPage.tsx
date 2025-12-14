@@ -8,10 +8,10 @@ import Badge from '@/components/ui/Badge';
 
 const ManageUsersPage = () => {
     const [users, setUsers] = useState<UserDto[]>([]);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
 
     const fetchUsers = async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const response = await userService.getAllUsers();
             if (Array.isArray(response)) {
@@ -24,7 +24,7 @@ const ManageUsersPage = () => {
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 

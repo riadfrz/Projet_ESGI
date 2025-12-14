@@ -6,8 +6,6 @@ import {
     QueryChallengesDto, 
     ChallengeDto, 
     ChallengeWithDetailsDto,
-    InviteUserDto,
-    UpdateParticipantStatusDto,
     PaginatedResponseDto
 } from '@shared/dto';
 
@@ -44,6 +42,14 @@ class ChallengeService {
 
     public async leaveChallenge(challengeId: string): Promise<ApiResponse<void>> {
         return api.fetchRequest(`/api/challenges/${challengeId}/leave`, 'DELETE', null, true);
+    }
+
+    public async inviteUsers(challengeId: string, userIds: string[]): Promise<ApiResponse<void>> {
+        return api.fetchRequest(`/api/challenges/${challengeId}/invite`, 'POST', { userIds }, true);
+    }
+
+    public async updateParticipantStatus(challengeId: string, userId: string, status: string): Promise<ApiResponse<void>> {
+        return api.fetchRequest(`/api/challenges/${challengeId}/participants/${userId}`, 'PATCH', { status }, true);
     }
 }
 
