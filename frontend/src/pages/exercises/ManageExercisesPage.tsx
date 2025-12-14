@@ -7,8 +7,9 @@ import { ExerciseCard } from '@/components/exercises/ExerciseCard';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
+import { PaginationMeta } from '@/types/apiTypes';
 
 const ManageExercisesPage = () => {
     const [exercises, setExercises] = useState<ExerciseDto[]>([]);
@@ -19,6 +20,17 @@ const ManageExercisesPage = () => {
     const [viewingExercise, setViewingExercise] = useState<ExerciseWithMusclesDto | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | ''>('');
+    
+    // Pagination State
+    const [pagination, setPagination] = useState<PaginationMeta>({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        nextPage: 0,
+        previousPage: 0,
+        perPage: 12
+    });
+    const [limit, setLimit] = useState(12);
 
     // Form State
     const [formData, setFormData] = useState<Partial<CreateExerciseDto>>({
@@ -28,10 +40,13 @@ const ManageExercisesPage = () => {
         muscleIds: []
     });
 
-    const fetchData = async () => {
+    const fetchData = async (page = 1) => {
         setLoading(true);
         try {
-            const query: any = { limit: '1000' };
+            const query: any = { 
+                page: page.toString(), 
+                limit: limit.toString() 
+            };
             if (searchQuery) query.search = searchQuery;
             if (difficultyFilter) query.difficulty = difficultyFilter;
 
@@ -42,6 +57,14 @@ const ManageExercisesPage = () => {
             
             if (exRes.data && !Array.isArray(exRes.data)) {
                 setExercises(exRes.data.data);
+                // Check for pagination in the data object (standard for PaginatedResponse)
+                if (exRes.data.pagination) {
+                    setPagination(exRes.data.pagination);
+                } 
+                // Fallback: Check for pagination at root (standard for jsonResponse with 5th arg)
+                else if (exRes.pagination) {
+                    setPagination(exRes.pagination);
+                }
             } else {
                 setExercises([]);
             }
@@ -61,10 +84,19 @@ const ManageExercisesPage = () => {
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            fetchData();
+            fetchData(1); // Reset to page 1 on filter change
         }, 500);
         return () => clearTimeout(timeoutId);
-    }, [searchQuery, difficultyFilter]);
+    }, [searchQuery, difficultyFilter, limit]);
+
+    const handlePageChange = (newPage: number) => {
+        // Only fetch if page is different and valid
+        if (newPage >= 1 && newPage <= pagination.totalPages && newPage !== pagination.currentPage) {
+            // Update pagination state immediately to reflect change in UI
+            setPagination(prev => ({ ...prev, currentPage: newPage }));
+            fetchData(newPage);
+        }
+    };
 
     const toggleMuscle = (id: string) => {
         setFormData(prev => {
@@ -154,17 +186,17 @@ const ManageExercisesPage = () => {
 
             {/* Filters */}
             <Card className="p-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-4 items-center">
+                    <div className="flex-1 w-full">
                         <Input 
                             placeholder="Search exercises..." 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="w-full md:w-48">
+                    <div className="w-full md:w-48 relative">
                         <select 
-                            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue outline-none transition-all h-[42px]"
+                            className="w-full bg-dark-bg border border-white/10 rounded-lg pl-4 pr-10 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue outline-none transition-all h-[42px] appearance-none cursor-pointer"
                             value={difficultyFilter}
                             onChange={(e) => setDifficultyFilter(e.target.value as Difficulty)}
                         >
@@ -173,6 +205,38 @@ const ManageExercisesPage = () => {
                                 <option key={d} value={d}>{d}</option>
                             ))}
                         </select>
+                        <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                    <div className="w-full md:w-40 relative">
+                        <select 
+                            className="w-full bg-dark-bg border border-white/10 rounded-lg pl-4 pr-10 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue outline-none transition-all h-[42px] appearance-none cursor-pointer"
+                            value={limit}
+                            onChange={(e) => setLimit(Number(e.target.value))}
+                        >
+                            <option value="12">12 per page</option>
+                            <option value="24">24 per page</option>
+                            <option value="48">48 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                        <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                    
+                    {/* Top Pagination Controls */}
+                    <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+                        <button 
+                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            disabled={pagination.currentPage === 1}
+                            className="p-2 rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed text-gray-400 hover:text-white transition-colors"
+                        >
+                            <ChevronLeftIcon className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                            disabled={pagination.currentPage === pagination.totalPages}
+                            className="p-2 rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed text-gray-400 hover:text-white transition-colors"
+                        >
+                            <ChevronRightIcon className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </Card>
@@ -255,6 +319,33 @@ const ManageExercisesPage = () => {
                             No exercises found.
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-8">
+                    <Button 
+                        variant="secondary" 
+                        size="sm"
+                        onClick={() => handlePageChange(pagination.currentPage - 1)}
+                        disabled={pagination.currentPage === 1}
+                    >
+                        <ChevronLeftIcon className="w-5 h-5" />
+                    </Button>
+                    
+                    <span className="text-gray-400">
+                        Page <span className="text-white font-bold">{pagination.currentPage}</span> of <span className="text-white font-bold">{pagination.totalPages}</span>
+                    </span>
+
+                    <Button 
+                        variant="secondary" 
+                        size="sm"
+                        onClick={() => handlePageChange(pagination.currentPage + 1)}
+                        disabled={pagination.currentPage === pagination.totalPages}
+                    >
+                        <ChevronRightIcon className="w-5 h-5" />
+                    </Button>
                 </div>
             )}
 
