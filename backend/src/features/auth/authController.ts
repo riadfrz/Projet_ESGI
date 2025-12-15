@@ -7,6 +7,9 @@ import { jsonResponse, authResponse } from "@/utils/jsonResponse";
 import { logger } from "@/utils/logger";
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { verify } from 'jsonwebtoken';
+const JWT_SECRET = process.env.JWT_SECRET!;
+
 import {
     CurrentUserResponseDto,
     GoogleProfileDto,
@@ -34,16 +37,29 @@ class AuthController {
     public getCurrentUser = asyncHandler<unknown, unknown, unknown, UserDto>({
         logger: this.logger,
         handler: async (request, reply): Promise<ApiResponse<UserDto | void> | void> => {
-            const sessionToken = request.cookies.session; // Better Auth uses cookies
+            const sessionToken = request.cookies.session;
+            let user = null;
 
-            if (!sessionToken) {
-                return jsonResponse(reply, 'Non authentifié', undefined, 401);
+            if (sessionToken) {
+                user = await authRepository.getCurrentUser(sessionToken);
+            } else {
+                // Try Bearer token
+                const authHeader = request.headers.authorization;
+                if (authHeader && authHeader.startsWith('Bearer ')) {
+                    const token = authHeader.split(' ')[1];
+                    try {
+                        const decoded = verify(token, JWT_SECRET) as any;
+                        if (decoded && decoded.id) {
+                            user = await userRepository.findById(decoded.id);
+                        }
+                    } catch (error) {
+                        this.logger.warn('Invalid JWT token in getCurrentUser');
+                    }
+                }
             }
 
-            const user = await authRepository.getCurrentUser(sessionToken);
-
             if (!user) {
-                return jsonResponse(reply, 'Session invalide', undefined, 401);
+                return jsonResponse(reply, 'Non authentifié', undefined, 401);
             }
 
             const userDto = authTransform.toUserDto(user);

@@ -4,47 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 
 /**
- * Hook for development login
- * Use this for testing purposes only
- */
-export const useDevLogin = () => {
-    const { setUser } = useAuthStore();
-
-    return useMutation({
-        mutationFn: async ({
-            email,
-            role,
-            firstName,
-            lastName,
-        }: {
-            email: string;
-            role?: string;
-            firstName?: string;
-            lastName?: string;
-        }) => {
-            const response = await authService.devLogin(email, role, firstName, lastName);
-            
-            if (response.data) {
-                // Session cookie is already set by backend
-                // Update store with user data
-                setUser(response.data);
-                return response.data;
-            } else {
-                throw new Error('Dev login failed');
-            }
-        },
-        onSuccess: (user) => {
-            console.log('Dev login successful:', user.email);
-        },
-        onError: (error: Error) => {
-            console.error('Dev login failed:', error.message);
-        },
-    });
-};
-
-/**
- * Hook for auto-login
- * Checks for existing session and fetches user data
+ * Hook for fetching current user data
  */
 export const useAutoLogin = () => {
     const { setUser, setIsAuthenticated } = useAuthStore();

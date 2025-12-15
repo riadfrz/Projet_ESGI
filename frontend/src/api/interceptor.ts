@@ -94,6 +94,7 @@ class Interceptor {
         const options: RequestInit = {
             method,
             headers: this.createHeaders(includeAuth, isFormData),
+            credentials: 'include', // Ensure cookies are sent/received
         };
 
         // J'ai ajouté cette partie pour que le DELETE fonctionne

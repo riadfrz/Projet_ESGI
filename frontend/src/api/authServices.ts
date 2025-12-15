@@ -1,33 +1,51 @@
 import { api } from '@/api/interceptor';
 import { ApiResponse } from '@/types';
-import { UserDto, SessionResponseDto } from '@shared/dto';
+import { UserDto, LoginDto, RegisterDto } from '@/types';
 import Cookies from 'js-cookie';
 
-/**
- * Authentication service for handling all auth-related API calls
- */
 class AuthService {
     /**
-     * Development login (only for testing)
-     * @param email - User email
-     * @param role - Optional role (CLIENT, ADMIN, TRAINER)
-     * @param firstName - Optional first name
-     * @param lastName - Optional last name
+     * Register a new user
      */
-    public async devLogin(
-        email: string,
-        role?: string,
-        firstName?: string,
-        lastName?: string
-    ): Promise<ApiResponse<UserDto>> {
-        const response = await api.fetchRequest('/api/auth/dev-login', 'POST', {
-            email,
-            role,
-            firstName,
-            lastName,
-        });
+    public async register(data: RegisterDto): Promise<ApiResponse<any>> {
+        const response = await api.fetchRequest('/api/auth/register', 'POST', data);
+        
+        // Backend returns raw { accessToken, refreshToken } on success for register too
+        if (response && response.accessToken) {
+             Cookies.set('accessToken', response.accessToken);
+             if (response.refreshToken) {
+                 Cookies.set('refreshToken', response.refreshToken);
+             }
+             return {
+                 status: 200, // or 201
+                 message: 'Registration successful',
+                 data: response,
+                 timestamp: new Date().toISOString()
+             };
+        }
+        return response;
+    }
 
-        // Note: Session token is set in HTTP-only cookie by backend
+    /**
+     * Login user
+     */
+    public async login(data: LoginDto): Promise<ApiResponse<{ accessToken: string; refreshToken: string }>> {
+        const response = await api.fetchRequest('/api/auth/login', 'POST', data);
+        
+        // Backend returns raw { accessToken, refreshToken } but we expect ApiResponse
+        if (response && response.accessToken) {
+            Cookies.set('accessToken', response.accessToken);
+            if (response.refreshToken) {
+                Cookies.set('refreshToken', response.refreshToken);
+            }
+            return {
+                status: 200,
+                message: 'Login successful',
+                data: response,
+                timestamp: new Date().toISOString()
+            };
+        }
+        
         return response;
     }
 
@@ -38,46 +56,37 @@ class AuthService {
         try {
             return await api.fetchRequest('/api/auth/me', 'GET', null, true);
         } catch (error) {
-            console.error('Failed to get current user:', error);
+            console.warn('Failed to get current user - might not be logged in', error);
             return null;
         }
     }
 
     /**
-     * Get user sessions
+     * Logout user
      */
-    public async getSessions(): Promise<ApiResponse<SessionResponseDto[]>> {
+    public async logout(): Promise<ApiResponse<void>> {
+        try {
+            return await api.fetchRequest('/api/auth/logout', 'POST', null, true);
+        } catch (error) {
+            console.error('Logout failed', error);
+            return { message: 'Logout failed', status: 500, data: undefined, timestamp: new Date().toISOString() };
+        }
+    }
+
+    public async getSessions(): Promise<ApiResponse<any[]>> {
         return api.fetchRequest('/api/auth/sessions', 'GET', null, true);
     }
 
-    /**
-     * Logout user (invalidates current session)
-     */
-    public async logout(): Promise<ApiResponse<void>> {
-        const response = await api.fetchRequest('/api/auth/logout', 'POST', null, true);
-        
-        // Clear any client-side tokens if they exist
-        Cookies.remove('accessToken');
-        Cookies.remove('refreshToken');
-        
-        return response;
-    }
-
-    /**
-     * Delete a specific session by ID
-     * @param sessionId - The ID of the session to delete
-     */
     public async deleteSession(sessionId: string): Promise<ApiResponse<void>> {
         return api.fetchRequest(`/api/auth/sessions/${sessionId}`, 'DELETE', null, true);
     }
 
     /**
      * Initiate Google OAuth login
-     * Redirects to Google OAuth page
      */
     public initiateGoogleLogin(): void {
         const backendUrl = api.getUrl();
-        window.location.href = `${backendUrl}/api/auth/google`;
+        window.location.href = `${backendUrl}/api/auth/google/callback`; // Usually starts flow, check backend route
     }
 }
 

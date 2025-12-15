@@ -95,7 +95,7 @@ export function UserProfile() {
                     <p className="text-gray-600">Loading sessions...</p>
                 ) : sessions && sessions.length > 0 ? (
                     <div className="space-y-3">
-                        {sessions.map((session) => (
+                        {sessions.map((session: any) => (
                             <div
                                 key={session.id}
                                 className="border rounded p-3 text-sm"

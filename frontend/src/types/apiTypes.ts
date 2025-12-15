@@ -20,8 +20,3 @@ export interface ApiError {
     status: number;
     errors?: Record<string, string[]>;
 }
-
-export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-}
